@@ -20,6 +20,9 @@ export 'login_model.dart';
 class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
 
+  static String routeName = 'Login';
+  static String routePath = '/login';
+  
   @override
   State<LoginWidget> createState() => _LoginWidgetState();
 }

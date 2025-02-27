@@ -16,8 +16,10 @@ const _kPrivateApiFunctionName = 'ffPrivateApiCall';
 /// Start Auth Group Code
 
 class AuthGroup {
-  static String getBaseUrl() =>
-      'https://us-central1-appseller-ofi.cloudfunctions.net/appAuthSeller/';
+  static String getBaseUrl({
+    String? enviroment = 'prod-appseller-ofima',
+  }) =>
+      'https://us-central1-${enviroment}.cloudfunctions.net/appAuthSeller/';
   static Map<String, String> headers = {};
   static LoginSellerCall loginSellerCall = LoginSellerCall();
   static RecoveryPasswordCall recoveryPasswordCall = RecoveryPasswordCall();
@@ -28,8 +30,11 @@ class LoginSellerCall {
     String? identification = '',
     String? email = '',
     String? password = '',
+    String? enviroment = 'prod-appseller-ofima',
   }) async {
-    final baseUrl = AuthGroup.getBaseUrl();
+    final baseUrl = AuthGroup.getBaseUrl(
+      enviroment: enviroment,
+    );
 
     final ffApiRequestBody = '''
 {
@@ -59,8 +64,11 @@ class RecoveryPasswordCall {
   Future<ApiCallResponse> call({
     String? nit = '',
     String? email = '',
+    String? enviroment = 'prod-appseller-ofima',
   }) async {
-    final baseUrl = AuthGroup.getBaseUrl();
+    final baseUrl = AuthGroup.getBaseUrl(
+      enviroment: enviroment,
+    );
 
     final ffApiRequestBody = '''
 {
@@ -92,8 +100,9 @@ class RecoveryPasswordCall {
 class ClientsGroup {
   static String getBaseUrl({
     String? token = '',
+    String? enviroment = 'prod-appseller-ofima',
   }) =>
-      'https://us-central1-appseller-ofi.cloudfunctions.net/appSeller/';
+      'https://us-central1-${enviroment}.cloudfunctions.net/appSeller/';
   static Map<String, String> headers = {
     'Authorization': 'Bearer [token]',
   };
@@ -105,9 +114,11 @@ class ClientsGroup {
 class ListClientByVendenCall {
   Future<ApiCallResponse> call({
     String? token = '',
+    String? enviroment = 'prod-appseller-ofima',
   }) async {
     final baseUrl = ClientsGroup.getBaseUrl(
       token: token,
+      enviroment: enviroment,
     );
 
     return ApiManager.instance.makeApiCall(
@@ -132,9 +143,11 @@ class UpdateClientCall {
   Future<ApiCallResponse> call({
     dynamic? dataJson,
     String? token = '',
+    String? enviroment = 'prod-appseller-ofima',
   }) async {
     final baseUrl = ClientsGroup.getBaseUrl(
       token: token,
+      enviroment: enviroment,
     );
 
     final data = _serializeJson(dataJson);
@@ -167,8 +180,9 @@ ${data}''';
 class MaestrasGroup {
   static String getBaseUrl({
     String? token = '',
+    String? enviroment = 'prod-appseller-ofima',
   }) =>
-      'https://us-central1-appseller-ofi.cloudfunctions.net/appMaster/';
+      'https://us-central1-${enviroment}.cloudfunctions.net/appMaster/';
   static Map<String, String> headers = {
     'Authorization': 'Bearer [token]',
   };
@@ -179,9 +193,11 @@ class MaestrasGroup {
 class GetListDeptoCall {
   Future<ApiCallResponse> call({
     String? token = '',
+    String? enviroment = 'prod-appseller-ofima',
   }) async {
     final baseUrl = MaestrasGroup.getBaseUrl(
       token: token,
+      enviroment: enviroment,
     );
 
     return ApiManager.instance.makeApiCall(
@@ -206,9 +222,11 @@ class ListCitiesCall {
   Future<ApiCallResponse> call({
     String? deparment = '',
     String? token = '',
+    String? enviroment = 'prod-appseller-ofima',
   }) async {
     final baseUrl = MaestrasGroup.getBaseUrl(
       token: token,
+      enviroment: enviroment,
     );
 
     final ffApiRequestBody = '''
@@ -242,8 +260,9 @@ class ListCitiesCall {
 class ProductsGroup {
   static String getBaseUrl({
     String? token = '',
+    String? enviroment = 'prod-appseller-ofima',
   }) =>
-      'https://us-central1-appseller-ofi.cloudfunctions.net/appSeller/';
+      'https://us-central1-${enviroment}.cloudfunctions.net/appSeller/';
   static Map<String, String> headers = {
     'Authorization': 'Bearer [token]',
   };
@@ -261,9 +280,11 @@ class PostListProductByCodPrecioCall {
     String? filter = '',
     String? codprecio = '',
     String? token = '',
+    String? enviroment = 'prod-appseller-ofima',
   }) async {
     final baseUrl = ProductsGroup.getBaseUrl(
       token: token,
+      enviroment: enviroment,
     );
 
     final ffApiRequestBody = '''
@@ -313,9 +334,11 @@ class GetListStorageByProductCall {
     String? codprecio = '',
     String? codproduc = '',
     String? token = '',
+    String? enviroment = 'prod-appseller-ofima',
   }) async {
     final baseUrl = ProductsGroup.getBaseUrl(
       token: token,
+      enviroment: enviroment,
     );
 
     return ApiManager.instance.makeApiCall(
@@ -342,9 +365,11 @@ class CreateOrderClientCall {
     String? nit = '',
     dynamic? listProductsJson,
     String? token = '',
+    String? enviroment = 'prod-appseller-ofima',
   }) async {
     final baseUrl = ProductsGroup.getBaseUrl(
       token: token,
+      enviroment: enviroment,
     );
 
     final listProducts = _serializeJson(listProductsJson, true);

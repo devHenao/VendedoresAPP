@@ -1,3 +1,4 @@
+import '/auth/custom_auth/auth_util.dart';
 import '/backend/api_requests/api_calls.dart';
 import '/backend/schema/structs/index.dart';
 import '/componentes/menu/menu_widget.dart';
@@ -11,6 +12,7 @@ import 'dart:math';
 import 'dart:ui';
 import '/custom_code/actions/index.dart' as actions;
 import '/flutter_flow/custom_functions.dart' as functions;
+import '/index.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -22,6 +24,9 @@ export 'clientes_model.dart';
 
 class ClientesWidget extends StatefulWidget {
   const ClientesWidget({super.key});
+
+  static String routeName = 'Clientes';
+  static String routePath = '/clientes';
 
   @override
   State<ClientesWidget> createState() => _ClientesWidgetState();
@@ -42,6 +47,7 @@ class _ClientesWidgetState extends State<ClientesWidget>
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
+      Function() _navigate = () {};
       _model.apiResultClientes = await ClientsGroup.listClientByVendenCall.call(
         token: FFAppState().infoSeller.token,
       );
@@ -78,7 +84,15 @@ class _ClientesWidgetState extends State<ClientesWidget>
             );
           },
         );
+        GoRouter.of(context).prepareAuthEvent();
+        await authManager.signOut();
+        GoRouter.of(context).clearRedirectLocation();
+
+        _navigate =
+            () => context.goNamedAuth(LoginWidget.routeName, context.mounted);
       }
+
+      _navigate();
     });
 
     _model.txtSearchTextController ??= TextEditingController();
@@ -1002,7 +1016,8 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                                                   onTap:
                                                                       () async {
                                                                     context.pushNamed(
-                                                                        'Productos');
+                                                                        ProductosWidget
+                                                                            .routeName);
                                                                   },
                                                                   child: Icon(
                                                                     Icons

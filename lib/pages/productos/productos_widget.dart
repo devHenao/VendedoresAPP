@@ -20,6 +20,9 @@ export 'productos_model.dart';
 class ProductosWidget extends StatefulWidget {
   const ProductosWidget({super.key});
 
+  static String routeName = 'Productos';
+  static String routePath = '/productos';
+
   @override
   State<ProductosWidget> createState() => _ProductosWidgetState();
 }
