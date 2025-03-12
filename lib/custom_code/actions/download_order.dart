@@ -12,7 +12,7 @@ Future<void> downloadOrder(
   String? identificacion,
 ) async {
   final url =
-      'https://us-central1-appseller-ofi.cloudfunctions.net/appSeller/clients/getOrderClient/$identificacion';
+      'https://us-central1-prod-appseller-ofima.cloudfunctions.net/appSeller/clients/getOrderClient/$identificacion';
 
 try {
     final response = await http.get(Uri.parse(url), headers: {
@@ -81,14 +81,19 @@ try {
           SnackBar(content: Text('Descarga no disponible para esta plataforma.')),
         );
       }
+    } else if (response.statusCode == 400) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No hay pedidos pendientes para esta identificación.')),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${response.statusCode}')),
+        SnackBar(content: Text('Error ${response.statusCode}: No se pudo descargar el archivo.')),
       );
     }
   } catch (e) {
+    print("Error de red o en la solicitud: $e");
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Excepción: $e')),
+      SnackBar(content: Text('Ocurrió un error al descargar el archivo.')),
     );
   }
 }

@@ -12,7 +12,7 @@ Future<void> downloadLastSales(
   String? identificacion,
 ) async {
   final url =
-      'https://us-central1-appseller-ofi.cloudfunctions.net/appSeller/clients/getLastSalesClient/$identificacion';
+      'https://us-central1-prod-appseller-ofima.cloudfunctions.net/appSeller/clients/getLastSalesClient/$identificacion';
 
   try {
     final response = await http.get(Uri.parse(url), headers: {
@@ -22,14 +22,18 @@ Future<void> downloadLastSales(
 
     if (response.statusCode == 200) {
       Uint8List fileBytes = response.bodyBytes;
-      final fileName = 'reporteUltimasVentas${identificacion}.pdf';
+      final fileName = 'reporteUltimasVentas_${identificacion}.pdf';
 
-      print("Tamaño del archivo: ${fileBytes.length} bytes");
+      if (fileBytes.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No hay datos disponibles para descargar.')),
+        );
+        return;
+      }
 
       if (io.Platform.isAndroid) {
         final methodChannel = MethodChannel('com.mycompany.appvendedores/media_store');
         try {
-          print("Enviando datos al método nativo...");
           final savedFilePath = await methodChannel.invokeMethod<String>('saveFile', {
             'fileBytes': fileBytes,
             'fileName': fileName,
@@ -37,19 +41,14 @@ Future<void> downloadLastSales(
           });
 
           if (savedFilePath != null) {
-            print("Archivo guardado en: $savedFilePath");
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Archivo guardado en: $savedFilePath'),
                 backgroundColor: Color(0xFF39D2C0),
               ),
             );
-
-            // Abrir el archivo inmediatamente después de guardarlo
-            final result = await OpenFile.open(savedFilePath);
-            print('Resultado de abrir el archivo: $result');
+            await OpenFile.open(savedFilePath);
           } else {
-            print("Error: No se pudo guardar el archivo");
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Error al guardar el archivo.')),
             );
@@ -57,7 +56,7 @@ Future<void> downloadLastSales(
         } catch (e) {
           print("Error en el canal: $e");
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error en el canal: $e')),
+            SnackBar(content: Text('No se pudo guardar el archivo.')),
           );
         }
       } else if (io.Platform.isIOS) {
@@ -72,23 +71,25 @@ Future<void> downloadLastSales(
             backgroundColor: Color(0xFF39D2C0),
           ),
         );
-
-        // Abrir el archivo inmediatamente después de guardarlo
-        final result = await OpenFile.open(filePath);
-        print('Resultado de abrir el archivo: $result');
+        await OpenFile.open(filePath);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Descarga no disponible para esta plataforma.')),
         );
       }
+    } else if (response.statusCode == 400) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No hay ventas para esta identificación.')),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${response.statusCode}')),
+        SnackBar(content: Text('Error ${response.statusCode}: No se pudo descargar el archivo.')),
       );
     }
   } catch (e) {
+    print("Error de red o en la solicitud: $e");
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Excepción: $e')),
+      SnackBar(content: Text('Ocurrió un error al descargar el archivo.')),
     );
   }
 }
