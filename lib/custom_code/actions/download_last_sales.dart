@@ -43,7 +43,7 @@ Future<void> downloadLastSales(
           if (savedFilePath != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Archivo guardado en: $savedFilePath'),
+                content: Text('Archivo guardado en descargas'),
                 backgroundColor: Color(0xFF39D2C0),
               ),
             );
