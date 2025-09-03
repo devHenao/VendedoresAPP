@@ -427,6 +427,7 @@ class _ClientesWidgetState extends State<ClientesWidget>
                           decoration: BoxDecoration(),
                           child: Builder(
                             builder: (context) {
+                              //MAPEO CONSULTA
                               final listaClientes = _model.clientes
                                   .map((e) => e)
                                   .toList()

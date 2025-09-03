@@ -1,5 +1,4 @@
 import 'package:rxdart/rxdart.dart';
-
 import 'custom_auth_manager.dart';
 
 class AppVendedoresAuthUser {
