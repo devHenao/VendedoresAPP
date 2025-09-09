@@ -718,198 +718,251 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                                               MainAxisAlignment
                                                                   .spaceBetween,
                                                           children: [
-                                                            Builder(
-                                                              builder: (context) =>
-                                                                  FlutterFlowIconButton(
-                                                                borderRadius:
-                                                                    8.0,
-                                                                buttonSize:
-                                                                    46.0,
-                                                                fillColor:
-                                                                    FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .info,
-                                                                icon: Icon(
-                                                                  Icons
-                                                                      .remove_red_eye_rounded,
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primary,
-                                                                  size: 30.0,
-                                                                ),
-                                                                showLoadingIndicator:
-                                                                    true,
-                                                                onPressed:
-                                                                    () async {
-                                                                  await showDialog(
-                                                                    context:
-                                                                        context,
-                                                                    builder:
-                                                                        (dialogContext) {
-                                                                      return Dialog(
-                                                                        elevation:
-                                                                            0,
-                                                                        insetPadding:
-                                                                            EdgeInsets.zero,
-                                                                        backgroundColor:
-                                                                            Colors.transparent,
-                                                                        alignment:
-                                                                            AlignmentDirectional(0.0, 0.0).resolve(Directionality.of(context)),
-                                                                        child:
-                                                                            GestureDetector(
-                                                                          onTap:
-                                                                              () {
-                                                                            FocusScope.of(dialogContext).unfocus();
-                                                                            FocusManager.instance.primaryFocus?.unfocus();
-                                                                          },
-                                                                          child:
-                                                                              UpdateClientWidget(
-                                                                            dataClients:
-                                                                                listaClientesItem,
-                                                                            updated:
-                                                                                () async {
-                                                                              _model.apiResultListaClientesUpdate = await ClientsGroup.listClientByVendenCall.call(
-                                                                                token: FFAppState().infoSeller.token,
-                                                                              );
+                                                            Column(
+                                                              mainAxisSize: MainAxisSize.max,
+                                                              children: [
+                                                                Builder(
+                                                                  builder: (context) =>
+                                                                      FlutterFlowIconButton(
+                                                                    borderRadius: 8.0,
+                                                                    buttonSize: 46.0,
+                                                                    fillColor:
+                                                                        FlutterFlowTheme.of(context)
+                                                                            .info,
+                                                                    icon: Icon(
+                                                                      Icons
+                                                                          .remove_red_eye_rounded,
+                                                                      color:
+                                                                          FlutterFlowTheme.of(context)
+                                                                              .primary,
+                                                                      size: 30.0,
+                                                                    ),
+                                                                    showLoadingIndicator: true,
+                                                                    onPressed: () async {
+                                                                      await showDialog(
+                                                                        context: context,
+                                                                        builder: (dialogContext) {
+                                                                          return Dialog(
+                                                                            elevation: 0,
+                                                                            insetPadding:
+                                                                                EdgeInsets.zero,
+                                                                            backgroundColor: Colors
+                                                                                .transparent,
+                                                                            alignment: AlignmentDirectional(
+                                                                                    0.0,
+                                                                                    0.0)
+                                                                                .resolve(Directionality.of(
+                                                                                    context)),
+                                                                            child: GestureDetector(
+                                                                              onTap: () {
+                                                                                FocusScope.of(dialogContext)
+                                                                                    .unfocus();
+                                                                                FocusManager
+                                                                                    .instance
+                                                                                    .primaryFocus
+                                                                                    ?.unfocus();
+                                                                              },
+                                                                              child:
+                                                                                  UpdateClientWidget(
+                                                                                dataClients:
+                                                                                    listaClientesItem,
+                                                                                updated: () async {
+                                                                                  _model.apiResultListaClientesUpdate =
+                                                                                      await ClientsGroup.listClientByVendenCall.call(
+                                                                                    token: FFAppState().infoSeller.token,
+                                                                                  );
 
-                                                                              if ((_model.apiResultListaClientesUpdate?.succeeded ?? true)) {
-                                                                                _model.clientes = (getJsonField(
-                                                                                  (_model.apiResultListaClientesUpdate?.jsonBody ?? ''),
-                                                                                  r'''$.data''',
-                                                                                  true,
-                                                                                )!
+                                                                                  if ((_model.apiResultListaClientesUpdate?.succeeded ??
+                                                                                      true)) {
+                                                                                    _model.clientes = (getJsonField(
+                                                                                      (_model.apiResultListaClientesUpdate?.jsonBody ??
+                                                                                          ''),
+                                                                                      r'''$.data''',
+                                                                                      true,
+                                                                                    )!
+                                                                                            .toList()
+                                                                                            .map<DataClienteStruct?>(DataClienteStruct.maybeFromMap)
+                                                                                            .toList() as Iterable<DataClienteStruct?>)
+                                                                                        .withoutNulls
                                                                                         .toList()
-                                                                                        .map<DataClienteStruct?>(DataClienteStruct.maybeFromMap)
-                                                                                        .toList() as Iterable<DataClienteStruct?>)
-                                                                                    .withoutNulls
-                                                                                    .toList()
-                                                                                    .cast<DataClienteStruct>();
-                                                                                safeSetState(() {});
-                                                                              } else {
-                                                                                await showDialog(
-                                                                                  context: context,
-                                                                                  builder: (alertDialogContext) {
-                                                                                    return AlertDialog(
-                                                                                      title: Text('Error'),
-                                                                                      content: Text(getJsonField(
-                                                                                        (_model.apiResultListaClientesUpdate?.jsonBody ?? ''),
-                                                                                        r'''$.data''',
-                                                                                      ).toString()),
-                                                                                      actions: [
-                                                                                        TextButton(
-                                                                                          onPressed: () => Navigator.pop(alertDialogContext),
-                                                                                          child: Text('Ok'),
-                                                                                        ),
-                                                                                      ],
+                                                                                        .cast<
+                                                                                            DataClienteStruct>();
+                                                                                    safeSetState(() {});
+                                                                                  } else {
+                                                                                    await showDialog(
+                                                                                      context:
+                                                                                          context,
+                                                                                      builder: (alertDialogContext) {
+                                                                                        return AlertDialog(
+                                                                                          title: Text(
+                                                                                              'Error'),
+                                                                                          content:
+                                                                                              Text(getJsonField(
+                                                                                            (_model.apiResultListaClientesUpdate?.jsonBody ??
+                                                                                                ''),
+                                                                                            r'''$.data''',
+                                                                                          ).toString()),
+                                                                                          actions: [
+                                                                                            TextButton(
+                                                                                              onPressed: () =>
+                                                                                                  Navigator.pop(alertDialogContext),
+                                                                                              child: Text(
+                                                                                                  'Ok'),
+                                                                                            ),
+                                                                                          ],
+                                                                                        );
+                                                                                      },
                                                                                     );
-                                                                                  },
-                                                                                );
-                                                                              }
-                                                                            },
-                                                                          ),
-                                                                        ),
+                                                                                  }
+                                                                                },
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        },
                                                                       );
-                                                                    },
-                                                                  );
 
-                                                                  safeSetState(
-                                                                      () {});
-                                                                },
-                                                              ),
-                                                            ),
-                                                            FlutterFlowIconButton(
-                                                              borderColor: Colors
-                                                                  .transparent,
-                                                              borderRadius: 8.0,
-                                                              buttonSize: 46.0,
-                                                              fillColor:
-                                                                  FlutterFlowTheme.of(
+                                                                      safeSetState(() {});
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  'Detalle',
+                                                                  style: FlutterFlowTheme.of(
                                                                           context)
-                                                                      .info,
-                                                              icon: Icon(
-                                                                Icons.wallet,
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .success,
-                                                                size: 30.0,
-                                                              ),
-                                                              showLoadingIndicator:
-                                                                  true,
-                                                              onPressed:
-                                                                  () async {
-                                                                await actions
-                                                                    .dowloandWallet(
-                                                                  context,
-                                                                  FFAppState()
-                                                                      .infoSeller
-                                                                      .token,
-                                                                  listaClientesItem
-                                                                      .nit,
-                                                                );
-                                                              },
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        fontFamily: 'Manrope',
+                                                                        letterSpacing: 0.0,
+                                                                      ),
+                                                                ),
+                                                              ],
                                                             ),
-                                                            FlutterFlowIconButton(
-                                                              borderColor: Colors
-                                                                  .transparent,
-                                                              borderRadius: 8.0,
-                                                              buttonSize: 46.0,
-                                                              fillColor:
-                                                                  FlutterFlowTheme.of(
+                                                            Column(
+                                                              mainAxisSize: MainAxisSize.max,
+                                                              children: [
+                                                                FlutterFlowIconButton(
+                                                                  borderColor:
+                                                                      Colors.transparent,
+                                                                  borderRadius: 8.0,
+                                                                  buttonSize: 46.0,
+                                                                  fillColor:
+                                                                      FlutterFlowTheme.of(context)
+                                                                          .info,
+                                                                  icon: Icon(
+                                                                    Icons.wallet,
+                                                                    color:
+                                                                        FlutterFlowTheme.of(context)
+                                                                            .success,
+                                                                    size: 30.0,
+                                                                  ),
+                                                                  showLoadingIndicator: true,
+                                                                  onPressed: () async {
+                                                                    await actions
+                                                                        .dowloandWallet(
+                                                                      context,
+                                                                      FFAppState()
+                                                                          .infoSeller
+                                                                          .token,
+                                                                      listaClientesItem.nit,
+                                                                    );
+                                                                  },
+                                                                ),
+                                                                Text(
+                                                                  'Cartera',
+                                                                  style: FlutterFlowTheme.of(
                                                                           context)
-                                                                      .info,
-                                                              icon: Icon(
-                                                                Icons
-                                                                    .pending_actions_rounded,
-                                                                color: Color(
-                                                                    0xFFF87C23),
-                                                                size: 30.0,
-                                                              ),
-                                                              showLoadingIndicator:
-                                                                  true,
-                                                              onPressed:
-                                                                  () async {
-                                                                await actions
-                                                                    .downloadOrder(
-                                                                  context,
-                                                                  FFAppState()
-                                                                      .infoSeller
-                                                                      .token,
-                                                                  listaClientesItem
-                                                                      .nit,
-                                                                );
-                                                              },
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        fontFamily: 'Manrope',
+                                                                        letterSpacing: 0.0,
+                                                                      ),
+                                                                ),
+                                                              ],
                                                             ),
-                                                            FlutterFlowIconButton(
-                                                              borderColor: Colors
-                                                                  .transparent,
-                                                              borderRadius: 8.0,
-                                                              buttonSize: 46.0,
-                                                              fillColor:
-                                                                  FlutterFlowTheme.of(
+                                                            Column(
+                                                              mainAxisSize: MainAxisSize.max,
+                                                              children: [
+                                                                FlutterFlowIconButton(
+                                                                  borderColor:
+                                                                      Colors.transparent,
+                                                                  borderRadius: 8.0,
+                                                                  buttonSize: 46.0,
+                                                                  fillColor:
+                                                                      FlutterFlowTheme.of(context)
+                                                                          .info,
+                                                                  icon: Icon(
+                                                                    Icons
+                                                                        .pending_actions_rounded,
+                                                                    color:
+                                                                        Color(0xFFF87C23),
+                                                                    size: 30.0,
+                                                                  ),
+                                                                  showLoadingIndicator: true,
+                                                                  onPressed: () async {
+                                                                    await actions
+                                                                        .downloadOrder(
+                                                                      context,
+                                                                      FFAppState()
+                                                                          .infoSeller
+                                                                          .token,
+                                                                      listaClientesItem.nit,
+                                                                    );
+                                                                  },
+                                                                ),
+                                                                Text(
+                                                                  'Pendientes',
+                                                                  style: FlutterFlowTheme.of(
                                                                           context)
-                                                                      .info,
-                                                              icon: Icon(
-                                                                Icons
-                                                                    .content_paste_search_rounded,
-                                                                color: FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .secondaryText,
-                                                                size: 30.0,
-                                                              ),
-                                                              showLoadingIndicator:
-                                                                  true,
-                                                              onPressed:
-                                                                  () async {
-                                                                await actions
-                                                                    .downloadLastSales(
-                                                                  context,
-                                                                  FFAppState()
-                                                                      .infoSeller
-                                                                      .token,
-                                                                  listaClientesItem
-                                                                      .nit,
-                                                                );
-                                                              },
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        fontFamily: 'Manrope',
+                                                                        letterSpacing: 0.0,
+                                                                      ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            Column(
+                                                              mainAxisSize: MainAxisSize.max,
+                                                              children: [
+                                                                FlutterFlowIconButton(
+                                                                  borderColor:
+                                                                      Colors.transparent,
+                                                                  borderRadius: 8.0,
+                                                                  buttonSize: 46.0,
+                                                                  fillColor:
+                                                                      FlutterFlowTheme.of(context)
+                                                                          .info,
+                                                                  icon: Icon(
+                                                                    Icons
+                                                                        .content_paste_search_rounded,
+                                                                    color:
+                                                                        FlutterFlowTheme.of(context)
+                                                                            .secondaryText,
+                                                                    size: 30.0,
+                                                                  ),
+                                                                  showLoadingIndicator: true,
+                                                                  onPressed: () async {
+                                                                    await actions
+                                                                        .downloadLastSales(
+                                                                      context,
+                                                                      FFAppState()
+                                                                          .infoSeller
+                                                                          .token,
+                                                                      listaClientesItem.nit,
+                                                                    );
+                                                                  },
+                                                                ),
+                                                                Text(
+                                                                  'Ventas',
+                                                                  style: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .bodyMedium
+                                                                      .override(
+                                                                        fontFamily: 'Manrope',
+                                                                        letterSpacing: 0.0,
+                                                                      ),
+                                                                ),
+                                                              ],
                                                             ),
                                                           ],
                                                         ),
