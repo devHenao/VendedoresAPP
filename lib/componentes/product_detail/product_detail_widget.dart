@@ -5,14 +5,12 @@ import '/flutter_flow/flutter_flow_animations.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:math';
 import 'dart:ui';
 import '/custom_code/actions/index.dart' as actions;
 import '/flutter_flow/custom_functions.dart' as functions;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'product_detail_model.dart';
 export 'product_detail_model.dart';
@@ -145,10 +143,9 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget>
               color: Color(0xFFE0E3E7),
             ),
           ),
-          child: Padding(
-            padding: EdgeInsets.all(12.0),
-            child: SingleChildScrollView(
-              primary: false,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,7 +175,7 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget>
                                         ),
                                   ),
                                 ),
-                              ].divide(SizedBox(width: 5.0)),
+                              ].divide(const SizedBox(width: 5.0)),
                             ),
                           ],
                         ),
@@ -261,7 +258,7 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget>
                                     letterSpacing: 0.0,
                                   ),
                             ),
-                          ].divide(SizedBox(width: 5.0)),
+                          ].divide(const SizedBox(width: 5.0)),
                         ),
                         Row(
                           mainAxisSize: MainAxisSize.max,
@@ -292,14 +289,14 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget>
                                     letterSpacing: 0.0,
                                   ),
                             ),
-                          ].divide(SizedBox(width: 5.0)),
+                          ].divide(const SizedBox(width: 5.0)),
                         ),
                       ],
                     ),
                   if (!(_model.listDetail.isNotEmpty))
                     Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 15.0, 0.0, 0.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 15.0, 0.0, 0.0),
                       child: Row(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -320,243 +317,225 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget>
                       ),
                     ),
                   Padding(
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 12.0, 0.0, 0.0),
-                    child: Container(
-                      decoration: BoxDecoration(),
-                      child: SingleChildScrollView(
-                        primary: false,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            Builder(
-                              builder: (context) {
-                                final listBodegas = _model.listDetail.toList();
-
-                                return ListView.separated(
-                                  padding: EdgeInsets.zero,
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.vertical,
-                                  itemCount: listBodegas.length,
-                                  separatorBuilder: (_, __) =>
-                                      SizedBox(height: 10.0),
-                                  itemBuilder: (context, listBodegasIndex) {
-                                    final listBodegasItem =
-                                        listBodegas[listBodegasIndex];
-                                    return wrapWithModel(
-                                      model: _model.itemProductDetailModels
-                                          .getModel(
-                                        listBodegasIndex.toString(),
-                                        listBodegasIndex,
-                                      ),
-                                      updateCallback: () => safeSetState(() {}),
-                                      updateOnChange: true,
-                                      child: ItemProductDetailWidget(
-                                        key: Key(
-                                          'Keyo8r_${listBodegasIndex.toString()}',
-                                        ),
-                                        pCantidad: listBodegasItem.cantidad,
-                                        itemList: listBodegasItem,
-                                        callbackCantidad: (pCantidad) async {
-                                          _model.resultadoCantidad =
-                                              await actions
-                                                  .modificarCantidadBodega(
-                                            listBodegasItem,
-                                            _model.listDetail.toList(),
-                                            pCantidad,
-                                          );
-                                          _model.listDetail = _model
-                                              .resultadoCantidad!
-                                              .toList()
-                                              .cast<DetailProductStruct>();
-                                          _model.updatePage(() {});
-                                          _model.resultadoCarrito =
-                                              await actions
-                                                  .agregarProductoCarrito(
-                                            FFAppState().shoppingCart.toList(),
-                                            DataProductStruct(
-                                              codproduc: listBodegasItem.codigo,
-                                              precio: listBodegasItem.precio,
-                                              descripcio:
-                                                  listBodegasItem.descripcio,
-                                              selected: true,
-                                              saldo: listBodegasItem.saldo,
-                                              cantidad:
-                                                  listBodegasItem.cantidad,
-                                              unidadmed:
-                                                  listBodegasItem.unidadmed,
-                                              codtariva:
-                                                  listBodegasItem.codtariva,
-                                              iva: listBodegasItem.iva,
-                                              codbarras: '',
-                                            ),
-                                            listBodegasItem.bodega,
-                                            listBodegasItem.codcc,
-                                            listBodegasItem.codlote,
+                    padding: const EdgeInsetsDirectional.fromSTEB(
+                        0.0, 12.0, 0.0, 0.0),
+                    child: Builder(
+                      builder: (context) {
+                        final listBodegas = _model.listDetail.toList();
+                        return ListView.separated(
+                          padding: EdgeInsets.zero,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: listBodegas.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 10.0),
+                          itemBuilder: (context, listBodegasIndex) {
+                            final listBodegasItem =
+                                listBodegas[listBodegasIndex];
+                            return wrapWithModel(
+                              model: _model.itemProductDetailModels.getModel(
+                                listBodegasIndex.toString(),
+                                listBodegasIndex,
+                              ),
+                              updateCallback: () => safeSetState(() {}),
+                              updateOnChange: true,
+                              child: ItemProductDetailWidget(
+                                key: Key(
+                                  'Keyo8r_${listBodegasIndex.toString()}',
+                                ),
+                                pCantidad: listBodegasItem.cantidad,
+                                itemList: listBodegasItem,
+                                callbackCantidad: (pCantidad) async {
+                                  _model.resultadoCantidad =
+                                      await actions.modificarCantidadBodega(
+                                    listBodegasItem,
+                                    _model.listDetail.toList(),
+                                    pCantidad,
+                                  );
+                                  _model.listDetail = _model.resultadoCantidad!
+                                      .toList()
+                                      .cast<DetailProductStruct>();
+                                  _model.updatePage(() {});
+                                  _model.resultadoCarrito = await actions
+                                      .agregarProductoCarrito(
+                                    FFAppState().shoppingCart.toList(),
+                                    DataProductStruct(
+                                      codproduc: listBodegasItem.codigo,
+                                      precio: listBodegasItem.precio,
+                                      descripcio:
+                                          listBodegasItem.descripcio,
+                                      selected: true,
+                                      saldo: listBodegasItem.saldo,
+                                      cantidad: listBodegasItem.cantidad,
+                                      unidadmed:
+                                          listBodegasItem.unidadmed,
+                                      codtariva:
+                                          listBodegasItem.codtariva,
+                                      iva: listBodegasItem.iva,
+                                      codbarras: '',
+                                    ),
+                                    listBodegasItem.bodega,
+                                    listBodegasItem.codcc,
+                                    listBodegasItem.codlote,
+                                    listBodegasItem.cantidad,
+                                  );
+                                  FFAppState().shoppingCart = _model
+                                      .resultadoCarrito!
+                                      .toList()
+                                      .cast<DetailProductStruct>();
+                                  FFAppState().update(() {});
+                                  if (functions.onList(
+                                          FFAppState()
+                                              .store
+                                              .map((e) => e.codigo)
+                                              .toList(),
+                                          widget.codproduc!) ==
+                                      true) {
+                                    _model.addCantidad = await actions
+                                        .modificarCantidadBodega(
+                                      DetailProductStruct(
+                                        codigo: widget.codproduc,
+                                        cantidad:
                                             listBodegasItem.cantidad,
-                                          );
-                                          FFAppState().shoppingCart = _model
-                                              .resultadoCarrito!
-                                              .toList()
-                                              .cast<DetailProductStruct>();
-                                          FFAppState().update(() {});
-                                          if (functions.onList(
-                                                  FFAppState()
-                                                      .store
-                                                      .map((e) => e.codigo)
-                                                      .toList(),
-                                                  widget!.codproduc!) ==
-                                              true) {
-                                            _model.addCantidad = await actions
-                                                .modificarCantidadBodega(
-                                              DetailProductStruct(
-                                                codigo: widget!.codproduc,
-                                                cantidad:
-                                                    listBodegasItem.cantidad,
-                                              ),
-                                              FFAppState().store.toList(),
-                                              pCantidad,
-                                            );
-                                            FFAppState().store = _model
-                                                .addCantidad!
-                                                .toList()
-                                                .cast<DetailProductStruct>();
-                                            FFAppState().update(() {});
-                                          } else {
-                                            FFAppState()
-                                                .addToStore(DetailProductStruct(
-                                              codigo: widget!.codproduc,
-                                              cantidad:
-                                                  listBodegasItem.cantidad,
-                                            ));
-                                            FFAppState().update(() {});
-                                          }
-
-                                          safeSetState(() {});
-                                        },
-                                        callbackEliminarBodega: () async {
-                                          if (FFAppState()
-                                                  .infoSeller
-                                                  .storageDefault !=
-                                              listBodegasItem.bodega) {
-                                            _model.resultadoEliminarBodega =
-                                                await actions
-                                                    .eliminarProductoCarrito(
-                                              listBodegasItem.bodega,
-                                              listBodegasItem.codcc,
-                                              listBodegasItem.codlote,
-                                              listBodegasItem.codigo,
-                                              FFAppState()
-                                                  .shoppingCart
-                                                  .toList(),
-                                            );
-                                            FFAppState().shoppingCart = _model
-                                                .resultadoEliminarBodega!
-                                                .toList()
-                                                .cast<DetailProductStruct>();
-                                            FFAppState().update(() {});
-                                          } else {
-                                            _model.resultadoEliminarBodega2 =
-                                                await actions
-                                                    .eliminarProductoCarrito(
-                                              FFAppState()
-                                                  .infoSeller
-                                                  .storageDefault,
-                                              listBodegasItem.codcc,
-                                              listBodegasItem.codlote,
-                                              listBodegasItem.codigo,
-                                              FFAppState()
-                                                  .shoppingCart
-                                                  .toList(),
-                                            );
-                                            FFAppState().shoppingCart = _model
-                                                .resultadoEliminarBodega2!
-                                                .toList()
-                                                .cast<DetailProductStruct>();
-                                            FFAppState().update(() {});
-                                          }
-
-                                          _model.deleteProduct =
-                                              await actions.deleteProduct(
-                                            FFAppState().store.toList(),
-                                            widget!.codproduc!,
-                                          );
-                                          FFAppState().store = _model
-                                              .deleteProduct!
-                                              .toList()
-                                              .cast<DetailProductStruct>();
-                                          safeSetState(() {});
-
-                                          safeSetState(() {});
-                                        },
-                                        callbackSeleccionadoBodega:
-                                            (state) async {
-                                          _model.resultBodega =
-                                              await actions.seleccionarProducto(
-                                            DataProductStruct(
-                                              codproduc: listBodegasItem.codigo,
-                                              precio: listBodegasItem.precio,
-                                              descripcio:
-                                                  listBodegasItem.descripcio,
-                                              saldo: listBodegasItem.saldo,
-                                              unidadmed:
-                                                  listBodegasItem.unidadmed,
-                                              codtariva:
-                                                  listBodegasItem.codtariva,
-                                              iva: listBodegasItem.iva,
-                                              selected: true,
-                                              codbarras: '',
-                                              cantidad:
-                                                  listBodegasItem.cantidad,
-                                            ),
-                                            widget!.codproduc!,
-                                          );
-                                          _model.addProduct = await actions
-                                              .agregarProductoCarrito(
-                                            FFAppState().shoppingCart.toList(),
-                                            DataProductStruct(
-                                              codproduc: listBodegasItem.codigo,
-                                              precio: listBodegasItem.precio,
-                                              descripcio:
-                                                  listBodegasItem.descripcio,
-                                              saldo: listBodegasItem.saldo,
-                                              unidadmed:
-                                                  listBodegasItem.unidadmed,
-                                              iva: listBodegasItem.iva,
-                                              codtariva:
-                                                  listBodegasItem.codtariva,
-                                              selected: true,
-                                              cantidad:
-                                                  listBodegasItem.cantidad,
-                                            ),
-                                            listBodegasItem.bodega,
-                                            listBodegasItem.codcc,
-                                            listBodegasItem.codlote,
-                                            listBodegasItem.cantidad,
-                                          );
-                                          FFAppState().shoppingCart = _model
-                                              .addProduct!
-                                              .toList()
-                                              .cast<DetailProductStruct>();
-                                          safeSetState(() {});
-
-                                          safeSetState(() {});
-                                        },
                                       ),
+                                      FFAppState().store.toList(),
+                                      pCantidad,
                                     );
-                                  },
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
+                                    FFAppState().store = _model.addCantidad!
+                                        .toList()
+                                        .cast<DetailProductStruct>();
+                                    FFAppState().update(() {});
+                                  } else {
+                                    FFAppState()
+                                        .addToStore(DetailProductStruct(
+                                      codigo: widget.codproduc,
+                                      cantidad:
+                                          listBodegasItem.cantidad,
+                                    ));
+                                    FFAppState().update(() {});
+                                  }
+
+                                  safeSetState(() {});
+                                },
+                                callbackEliminarBodega: () async {
+                                  if (FFAppState()
+                                          .infoSeller
+                                          .storageDefault != 
+                                      listBodegasItem.bodega) {
+                                    _model.resultadoEliminarBodega =
+                                        await actions
+                                            .eliminarProductoCarrito(
+                                      listBodegasItem.bodega,
+                                      listBodegasItem.codcc,
+                                      listBodegasItem.codlote,
+                                      listBodegasItem.codigo,
+                                      FFAppState()
+                                          .shoppingCart
+                                          .toList(),
+                                    );
+                                    FFAppState().shoppingCart = _model
+                                        .resultadoEliminarBodega!
+                                        .toList()
+                                        .cast<DetailProductStruct>();
+                                    FFAppState().update(() {});
+                                  } else {
+                                    _model.resultadoEliminarBodega2 =
+                                        await actions
+                                            .eliminarProductoCarrito(
+                                      FFAppState()
+                                          .infoSeller
+                                          .storageDefault,
+                                      listBodegasItem.codcc,
+                                      listBodegasItem.codlote,
+                                      listBodegasItem.codigo,
+                                      FFAppState()
+                                          .shoppingCart
+                                          .toList(),
+                                    );
+                                    FFAppState().shoppingCart = _model
+                                        .resultadoEliminarBodega2!
+                                        .toList()
+                                        .cast<DetailProductStruct>();
+                                    FFAppState().update(() {});
+                                  }
+
+                                  _model.deleteProduct =
+                                      await actions.deleteProduct(
+                                    FFAppState().store.toList(),
+                                    widget.codproduc!,
+                                  );
+                                  FFAppState().store = _model
+                                      .deleteProduct!
+                                      .toList()
+                                      .cast<DetailProductStruct>();
+                                  safeSetState(() {});
+
+                                  safeSetState(() {});
+                                },
+                                callbackSeleccionadoBodega:
+                                    (state) async {
+                                  _model.resultBodega =
+                                      await actions.seleccionarProducto(
+                                    DataProductStruct(
+                                      codproduc: listBodegasItem.codigo,
+                                      precio: listBodegasItem.precio,
+                                      descripcio:
+                                          listBodegasItem.descripcio,
+                                      saldo: listBodegasItem.saldo,
+                                      unidadmed:
+                                          listBodegasItem.unidadmed,
+                                      codtariva:
+                                          listBodegasItem.codtariva,
+                                      iva: listBodegasItem.iva,
+                                      selected: true,
+                                      codbarras: '',
+                                      cantidad:
+                                          listBodegasItem.cantidad,
+                                    ),
+                                    widget.codproduc!,
+                                  );
+                                  _model.addProduct = await actions
+                                      .agregarProductoCarrito(
+                                    FFAppState().shoppingCart.toList(),
+                                    DataProductStruct(
+                                      codproduc: listBodegasItem.codigo,
+                                      precio: listBodegasItem.precio,
+                                      descripcio:
+                                          listBodegasItem.descripcio,
+                                      saldo: listBodegasItem.saldo,
+                                      unidadmed:
+                                          listBodegasItem.unidadmed,
+                                      iva: listBodegasItem.iva,
+                                      codtariva:
+                                          listBodegasItem.codtariva,
+                                      selected: true,
+                                      cantidad:
+                                          listBodegasItem.cantidad,
+                                    ),
+                                    listBodegasItem.bodega,
+                                    listBodegasItem.codcc,
+                                    listBodegasItem.codlote,
+                                    listBodegasItem.cantidad,
+                                  );
+                                  FFAppState().shoppingCart = _model
+                                      .addProduct!
+                                      .toList()
+                                      .cast<DetailProductStruct>();
+                                  safeSetState(() {});
+
+                                  safeSetState(() {});
+                                },
+                              ),
+                            );
+                          },
+                        );
+                      },
                     ),
                   ),
                   if (_model.listDetail.isNotEmpty)
                     Padding(
-                      padding:
-                          EdgeInsetsDirectional.fromSTEB(0.0, 20.0, 0.0, 12.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          0.0, 20.0, 0.0, 12.0),
                       child: Row(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -597,7 +576,7 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget>
                               ),
                             ),
                           ),
-                        ].divide(SizedBox(width: 20.0)),
+                        ].divide(const SizedBox(width: 20.0)),
                       ),
                     ),
                 ],
