@@ -43,15 +43,61 @@ class _UpdateClientWidgetState extends State<UpdateClientWidget>
     _model.onUpdate();
   }
 
+  Future<void> _loadCities(String department) async {
+    _model.apiResultCity = await MaestrasGroup.listCitiesCall.call(
+      token: FFAppState().infoSeller.token,
+      deparment: department,
+    );
+
+    if ((_model.apiResultCity?.succeeded ?? true)) {
+      _model.listCity = (getJsonField(
+        (_model.apiResultCity?.jsonBody ?? ''),
+        r'''$.data''',
+        true,
+      )!
+              .toList()
+              .map<DataCityStruct?>(DataCityStruct.maybeFromMap)
+              .toList() as Iterable<DataCityStruct?>)
+          .withoutNulls
+          .toList()
+          .cast<DataCityStruct>();
+      safeSetState(() {});
+    } else {
+      await showDialog(
+        context: context,
+        builder: (alertDialogContext) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text(getJsonField(
+              (_model.apiResultCity?.jsonBody ?? ''),
+              r'''$.data''',
+            ).toString()),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(alertDialogContext),
+                child: Text('Ok'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => UpdateClientModel());
 
+    // Inicializar los controladores de los dropdowns
+    _model.dropDepartmentValueController = FormFieldController<String>(null);
+    _model.dropCityValueController = FormFieldController<String>(null);
+
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      if (widget!.dataClients != null) {
-        _model.dpto = widget!.dataClients?.nomciud;
+      if (widget.dataClients != null) {
+        // Guardar el departamento del cliente
+        _model.dpto = widget.dataClients?.nomdpto;
         safeSetState(() {});
         await Future.wait([
           Future(() async {
@@ -154,12 +200,24 @@ class _UpdateClientWidgetState extends State<UpdateClientWidget>
           _model.txtDireccionTextController?.text =
               widget!.dataClients!.direccion;
         });
-        safeSetState(() {
-          _model.dropDepartmentValueController?.value = _model.dpto!;
-        });
-        safeSetState(() {
-          _model.dropCityValueController?.value = widget!.dataClients!.cdciiu;
-        });
+        // Cargar el departamento seleccionado
+        if (_model.dpto != null && _model.dpto!.isNotEmpty) {
+          safeSetState(() {
+            _model.dropDepartmentValue = _model.dpto!;
+            _model.dropDepartmentValueController?.value = _model.dpto!;
+          });
+          
+          // Cargar las ciudades para el departamento seleccionado
+          _loadCities(_model.dpto!).then((_) {
+            // Una vez cargadas las ciudades, seleccionar la ciudad del cliente
+            if (widget.dataClients?.cdciiu != null && widget.dataClients!.cdciiu.isNotEmpty) {
+              safeSetState(() {
+                _model.dropCityValue = widget.dataClients!.cdciiu;
+                _model.dropCityValueController?.value = widget.dataClients!.cdciiu;
+              });
+            }
+          });
+        }
       } else {
         await showDialog(
           context: context,
