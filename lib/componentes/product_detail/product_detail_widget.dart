@@ -7,7 +7,6 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'dart:ui';
 import '/custom_code/actions/index.dart' as actions;
-import '/flutter_flow/custom_functions.dart' as functions;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -383,37 +382,11 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget>
                                       .resultadoCarrito!
                                       .toList()
                                       .cast<DetailProductStruct>();
+                                  _model.updatedStore = await actions.updateStoreQuantity(
+                                    FFAppState().shoppingCart.toList(),
+                                  );
+                                  FFAppState().store = _model.updatedStore!.toList().cast<DetailProductStruct>();
                                   FFAppState().update(() {});
-                                  if (functions.onList(
-                                          FFAppState()
-                                              .store
-                                              .map((e) => e.codigo)
-                                              .toList(),
-                                          widget.codproduc!) ==
-                                      true) {
-                                    _model.addCantidad = await actions
-                                        .modificarCantidadBodega(
-                                      DetailProductStruct(
-                                        codigo: widget.codproduc,
-                                        cantidad:
-                                            listBodegasItem.cantidad,
-                                      ),
-                                      FFAppState().store.toList(),
-                                      pCantidad,
-                                    );
-                                    FFAppState().store = _model.addCantidad!
-                                        .toList()
-                                        .cast<DetailProductStruct>();
-                                    FFAppState().update(() {});
-                                  } else {
-                                    FFAppState()
-                                        .addToStore(DetailProductStruct(
-                                      codigo: widget.codproduc,
-                                      cantidad:
-                                          listBodegasItem.cantidad,
-                                    ));
-                                    FFAppState().update(() {});
-                                  }
 
                                   safeSetState(() {});
                                 },
@@ -437,6 +410,10 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget>
                                         .resultadoEliminarBodega!
                                         .toList()
                                         .cast<DetailProductStruct>();
+                                    _model.updatedStore2 = await actions.updateStoreQuantity(
+                                      FFAppState().shoppingCart.toList(),
+                                    );
+                                    FFAppState().store = _model.updatedStore2!.toList().cast<DetailProductStruct>();
                                     FFAppState().update(() {});
                                   } else {
                                     _model.resultadoEliminarBodega2 =
@@ -456,19 +433,13 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget>
                                         .resultadoEliminarBodega2!
                                         .toList()
                                         .cast<DetailProductStruct>();
+                                    _model.updatedStore3 = await actions.updateStoreQuantity(
+                                      FFAppState().shoppingCart.toList(),
+                                    );
+                                    FFAppState().store = _model.updatedStore3!.toList().cast<DetailProductStruct>();
                                     FFAppState().update(() {});
                                   }
 
-                                  _model.deleteProduct =
-                                      await actions.deleteProduct(
-                                    FFAppState().store.toList(),
-                                    widget.codproduc!,
-                                  );
-                                  FFAppState().store = _model
-                                      .deleteProduct!
-                                      .toList()
-                                      .cast<DetailProductStruct>();
-                                  safeSetState(() {});
 
                                   safeSetState(() {});
                                 },
@@ -521,6 +492,10 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget>
                                       .addProduct!
                                       .toList()
                                       .cast<DetailProductStruct>();
+                                  _model.updatedStore4 = await actions.updateStoreQuantity(
+                                    FFAppState().shoppingCart.toList(),
+                                  );
+                                  FFAppState().store = _model.updatedStore4!.toList().cast<DetailProductStruct>();
                                   safeSetState(() {});
 
                                   safeSetState(() {});

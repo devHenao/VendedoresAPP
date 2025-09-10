@@ -17,6 +17,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 class ProductosModel extends FlutterFlowModel<ProductosWidget> {
   ///  Local state fields for this page.
@@ -77,6 +78,59 @@ class ProductosModel extends FlutterFlowModel<ProductosWidget> {
   ApiCallResponse? apiResultNextPages;
   // Stores action output result for [Custom Action - actualizarListaProductosCache] action in btnNext widget.
   List<DataProductStruct>? resultadoNextPage;
+  List<DetailProductStruct>? updatedStore;
+  List<DetailProductStruct>? updatedStore2;
+  List<DetailProductStruct>? updatedStore3;
+
+  PagingController<ApiPagingParams, dynamic> setPagingController(
+    BuildContext context,
+    Future<ApiCallResponse> Function(ApiPagingParams) apiCall,
+  ) {
+    final controller = PagingController<ApiPagingParams, dynamic>(
+      firstPageKey: ApiPagingParams(
+        nextPageNumber: 0,
+        numItems: 0,
+        lastResponse: null,
+      ),
+    );
+    controller.addPageRequestListener((nextPageMarker) {
+      apiCall(nextPageMarker).then((listViewResponse) {
+        final responseData = getJsonField(
+          (listViewResponse.jsonBody ?? ''),
+          r'''$.data''',
+        );
+        final pageItems = getJsonField(
+          responseData,
+          r'''$.data''',
+          true,
+        ) as List;
+        final hasNextPage = getJsonField(
+          responseData,
+          r'''$.hasNextPage''',
+        ) as bool;
+
+        if (!hasNextPage) {
+          controller.appendLastPage(pageItems);
+        } else {
+          final nextPage = getJsonField(
+            responseData,
+            r'''$.nextPage''',
+          ) as int;
+          controller.appendPage(
+              pageItems,
+              ApiPagingParams(
+                nextPageNumber: nextPage,
+                numItems: 0,
+                lastResponse: null,
+              ));
+        }
+      }).catchError((error) {
+        print('Error fetching page: $error');
+        controller.error = error;
+      });
+    });
+    return controller;
+  }
 
   @override
   void initState(BuildContext context) {

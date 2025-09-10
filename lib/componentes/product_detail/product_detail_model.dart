@@ -45,7 +45,12 @@ class ProductDetailModel extends FlutterFlowModel<ProductDetailWidget> {
 
   ///  State fields for stateful widgets in this component.
 
-  // Stores action output result for [Backend Call - API (getListStorageByProduct)] action in productDetail widget.
+  List<DetailProductStruct>? updatedStore;
+  List<DetailProductStruct>? updatedStore2;
+  List<DetailProductStruct>? updatedStore3;
+  List<DetailProductStruct>? updatedStore4;
+
+  // Stores action output result for [Backend Call - API (getListStorageByProduct)] action in ProductDetail widget.
   ApiCallResponse? apiResultDetail;
   // Stores action output result for [Custom Action - actualizarListaProductosBodega] action in productDetail widget.
   List<DetailProductStruct>? resultadoBodega;

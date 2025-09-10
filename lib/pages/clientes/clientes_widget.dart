@@ -514,6 +514,7 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                                 safeSetState(() {});
                                                 FFAppState().shoppingCart = [];
                                                 FFAppState().productList = [];
+                                                FFAppState().store = [];
                                                 safeSetState(() {});
                                               }
                                             } else {

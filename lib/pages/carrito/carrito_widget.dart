@@ -678,6 +678,7 @@ class _CarritoWidgetState extends State<CarritoWidget> {
                                   );
 
                                   FFAppState().shoppingCart = [];
+                                  FFAppState().store = [];
                                   FFAppState().update(() {});
                                   _model.total = 0.0;
                                   safeSetState(() {});
@@ -778,6 +779,7 @@ class _CarritoWidgetState extends State<CarritoWidget> {
                                 false;
                             if (confirmDialogResponse) {
                               FFAppState().shoppingCart = [];
+                              FFAppState().store = [];
                               safeSetState(() {});
                               FFAppState().addToProductList(DataProductStruct(
                                 selected: false,

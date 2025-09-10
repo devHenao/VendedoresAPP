@@ -927,6 +927,13 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                                         .toList()
                                                         .cast<
                                                             DetailProductStruct>();
+                                                    _model.updatedStore = await actions
+                                                        .updateStoreQuantity(
+                                                      FFAppState().shoppingCart.toList(),
+                                                    );
+                                                    FFAppState().store = _model.updatedStore!
+                                                        .toList()
+                                                        .cast<DetailProductStruct>();
                                                     FFAppState().update(() {});
 
                                                     safeSetState(() {});
@@ -968,6 +975,13 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                                             .toList()
                                                             .cast<
                                                                 DetailProductStruct>();
+                                                    _model.updatedStore2 = await actions
+                                                        .updateStoreQuantity(
+                                                      FFAppState().shoppingCart.toList(),
+                                                    );
+                                                    FFAppState().store = _model.updatedStore2!
+                                                        .toList()
+                                                        .cast<DetailProductStruct>();
                                                     FFAppState().update(() {});
 
                                                     safeSetState(() {});
@@ -991,7 +1005,14 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                                         .toList()
                                                         .cast<
                                                             DetailProductStruct>();
-                                                    safeSetState(() {});
+                                                    _model.updatedStore3 = await actions
+                                                        .updateStoreQuantity(
+                                                      FFAppState().shoppingCart.toList(),
+                                                    );
+                                                    FFAppState().store = _model.updatedStore3!
+                                                        .toList()
+                                                        .cast<DetailProductStruct>();
+                                                    FFAppState().update(() {});
 
                                                     safeSetState(() {});
                                                   },

@@ -59,18 +59,7 @@ class _ProductWidgetState extends State<ProductWidget> {
 
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      _model.contador = valueOrDefault<double>(
-        () {
-          if (widget!.cantidad == 0.0) {
-            return 1.0;
-          } else if (widget!.cantidad == null) {
-            return 1.0;
-          } else {
-            return widget!.cantidad;
-          }
-        }(),
-        1.0,
-      );
+      _model.contador = widget.cantidad > 0.0 ? widget.cantidad : 1.0;
       _model.updatePage(() {});
       safeSetState(() {
         _model.amountTextController?.text = _model.contador!.toString();
