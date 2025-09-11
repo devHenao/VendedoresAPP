@@ -36,6 +36,10 @@ class ClientesModel extends FlutterFlowModel<ClientesWidget> {
   String? search;
 
   bool hasClientes = true;
+  
+  // Filtros de fecha
+  DateTime? fechaInicio;
+  DateTime? fechaFin;
 
   ///  State fields for stateful widgets in this page.
 

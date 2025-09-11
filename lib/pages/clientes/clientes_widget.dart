@@ -19,6 +19,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import 'clientes_model.dart';
 export 'clientes_model.dart';
 
@@ -44,6 +45,11 @@ class _ClientesWidgetState extends State<ClientesWidget>
   void initState() {
     super.initState();
     _model = createModel(context, () => ClientesModel());
+    
+    // Set initial date range to first and last day of current month
+    final now = DateTime.now();
+    _model.fechaInicio = DateTime(now.year, now.month, 1);
+    _model.fechaFin = DateTime(now.year, now.month + 1, 0);
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
@@ -354,6 +360,113 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                       ),
                                     ),
                                   ].divide(SizedBox(width: 20.0)),
+                                ),
+                              ),
+                              // Filtros de fecha
+                              Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 8.0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () async {
+                                          final date = await showDatePicker(
+                                            context: context,
+                                            initialDate: _model.fechaInicio ?? DateTime.now(),
+                                            firstDate: DateTime(2000),
+                                            lastDate: DateTime(2100),
+                                          );
+                                          if (date != null) {
+                                            setState(() {
+                                              _model.fechaInicio = date;
+                                            });
+                                          }
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(12.0),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: FlutterFlowTheme.of(context).alternate,
+                                            ),
+                                            borderRadius: BorderRadius.circular(8.0),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                _model.fechaInicio != null
+                                                    ? DateFormat('dd/MM/yyyy').format(_model.fechaInicio!)
+                                                    : 'Fecha de inicio',
+                                                style: FlutterFlowTheme.of(context).bodyMedium,
+                                              ),
+                                              Icon(
+                                                Icons.calendar_today,
+                                                size: 20,
+                                                color: FlutterFlowTheme.of(context).primary,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10.0),
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () async {
+                                          final date = await showDatePicker(
+                                            context: context,
+                                            initialDate: _model.fechaFin ?? DateTime.now(),
+                                            firstDate: DateTime(2000),
+                                            lastDate: DateTime(2100),
+                                          );
+                                          if (date != null) {
+                                            setState(() {
+                                              _model.fechaFin = date;
+                                            });
+                                          }
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(12.0),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: FlutterFlowTheme.of(context).alternate,
+                                            ),
+                                            borderRadius: BorderRadius.circular(8.0),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                _model.fechaFin != null
+                                                    ? DateFormat('dd/MM/yyyy').format(_model.fechaFin!)
+                                                    : 'Fecha de fin',
+                                                style: FlutterFlowTheme.of(context).bodyMedium,
+                                              ),
+                                              Icon(
+                                                Icons.calendar_today,
+                                                size: 20,
+                                                color: FlutterFlowTheme.of(context).primary,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    if (_model.fechaInicio != null || _model.fechaFin != null)
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.clear,
+                                          color: FlutterFlowTheme.of(context).error,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            _model.fechaInicio = null;
+                                            _model.fechaFin = null;
+                                          });
+                                        },
+                                      ),
+                                  ].divide(SizedBox(width: 8.0)),
                                 ),
                               ),
                               Divider(
