@@ -9,13 +9,25 @@ import 'package:path_provider/path_provider.dart';
 Future<void> dowloandWallet(
   BuildContext context,
   String? token,
-  String? identificacion,
-) async {
-  final url =
-      'https://us-central1-prod-appseller-ofima.cloudfunctions.net/appSeller/clients/getWalletClient/$identificacion';
+  String? identificacion, {
+  DateTime? startDate,
+  DateTime? endDate,
+}) async {
+  final baseUrl = 'https://us-central1-prod-appseller-ofima.cloudfunctions.net/appSeller/clients/getWalletClient/$identificacion';
+  
+  // Add query parameters if dates are provided
+  final params = <String, dynamic>{};
+  if (startDate != null) {
+    params['startDate'] = '${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}';
+  }
+  if (endDate != null) {
+    params['endDate'] = '${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}';
+  }
+  
+  final uri = Uri.parse(baseUrl).replace(queryParameters: params.isNotEmpty ? params : null);
 
   try {
-    final response = await http.get(Uri.parse(url), headers: {
+    final response = await http.get(uri, headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',
     });
