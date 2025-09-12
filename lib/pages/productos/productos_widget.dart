@@ -272,6 +272,7 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                         onFieldSubmitted: (_) async {
                                           _model.buscar = _model
                                               .txtBuscarTextController.text;
+                                          _model.hasProduct = true;
                                           safeSetState(() {});
                                           _model.apiResultaListProductsSubmit =
                                               await ProductsGroup
@@ -455,6 +456,7 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                               '') {
                                         _model.buscar =
                                             _model.txtBuscarTextController.text;
+                                        _model.hasProduct = true;
                                         safeSetState(() {});
                                         _model.apiResultaListProductsBoton =
                                             await ProductsGroup
@@ -847,30 +849,31 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                     ),
                   ),
                 if (_model.hasProduct == true)
-                  Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: CircularProgressIndicator(
+                  Padding(
+                    padding: EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation<Color>(
                             FlutterFlowTheme.of(context).primary,
                           ),
                         ),
-                      ),
-                      Text(
-                        'Cargando productos...',
-                        style: FlutterFlowTheme.of(context).titleSmall.override(
-                              fontFamily: 'Manrope',
-                              color: FlutterFlowTheme.of(context).primary,
-                              fontSize: 20.0,
-                              letterSpacing: 0.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      )
-                    ],
+                        SizedBox(height: 16.0),
+                        Text(
+                          'Buscando productos...',
+                          style: FlutterFlowTheme.of(context).titleSmall.override(
+                                fontFamily: 'Manrope',
+                                color: FlutterFlowTheme.of(context).primary,
+                                fontSize: 20.0,
+                                letterSpacing: 0.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        )
+                      ],
+                    ),
                   ),
                 if ((FFAppState().product == false) &&
                     !(FFAppState().productList.isNotEmpty))
