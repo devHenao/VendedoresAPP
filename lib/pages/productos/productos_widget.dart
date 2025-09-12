@@ -30,6 +30,7 @@ class ProductosWidget extends StatefulWidget {
 class _ProductosWidgetState extends State<ProductosWidget> {
   late ProductosModel _model;
   bool _isLoadingNextPage = false;
+  bool _isLoadingPrevPage = false;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -849,7 +850,7 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                       ].divide(SizedBox(width: 5.0)),
                     ),
                   ),
-                if (_model.hasProduct == true || _isLoadingNextPage)
+                if (_model.hasProduct == true || _isLoadingNextPage || _isLoadingPrevPage)
                   Padding(
                     padding: EdgeInsets.all(24.0),
                     child: Column(
@@ -1142,35 +1143,37 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                   color: FlutterFlowTheme.of(context).info,
                                   size: 20.0,
                                 ),
-                                onPressed: (_model.pages?.hasPreviousPage ==
-                                        false)
+                                onPressed: (_model.pages?.hasPreviousPage == false || _isLoadingPrevPage)
                                     ? null
                                     : () async {
-                                        _model.apiResultBackPage =
-                                            await ProductsGroup
-                                                .postListProductByCodPrecioCall
-                                                .call(
-                                          token: FFAppState().infoSeller.token,
-                                          pageNumber:
-                                              _model.pages!.currentPage - 1,
-                                          pageSize: 10,
-                                          filter: _model
-                                              .txtBuscarTextController.text,
-                                          codprecio: FFAppState()
-                                              .dataCliente
-                                              .codprecio,
-                                        );
+                                        setState(() {
+                                          _isLoadingPrevPage = true;
+                                        });
+                                        
+                                        try {
+                                          _model.apiResultBackPage =
+                                              await ProductsGroup
+                                                  .postListProductByCodPrecioCall
+                                                  .call(
+                                            token: FFAppState().infoSeller.token,
+                                            pageNumber:
+                                                _model.pages!.currentPage - 1,
+                                            pageSize: 10,
+                                            filter: _model
+                                                .txtBuscarTextController.text,
+                                            codprecio: FFAppState()
+                                                .dataCliente
+                                                .codprecio,
+                                          );
 
-                                        if ((_model
-                                                .apiResultBackPage?.succeeded ??
-                                            true)) {
-                                          _model.resultadoBackPage =
-                                              await actions
-                                                  .actualizarListaProductosCache(
-                                            (getJsonField(
-                                              (_model.apiResultBackPage
-                                                      ?.jsonBody ??
-                                                  ''),
+                                          if ((_model.apiResultBackPage?.succeeded ?? true)) {
+                                            _model.resultadoBackPage =
+                                                await actions
+                                                    .actualizarListaProductosCache(
+                                              (getJsonField(
+                                                (_model.apiResultBackPage
+                                                        ?.jsonBody ??
+                                                    ''),
                                               r'''$.data.data''',
                                               true,
                                             )!
@@ -1214,9 +1217,8 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                                 ).toString()),
                                                 actions: [
                                                   TextButton(
-                                                    onPressed: () =>
-                                                        Navigator.pop(
-                                                            alertDialogContext),
+                                                    onPressed: () => Navigator.pop(
+                                                        alertDialogContext),
                                                     child: Text('Ok'),
                                                   ),
                                                 ],
@@ -1224,8 +1226,15 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                             },
                                           );
                                         }
-
-                                        safeSetState(() {});
+                                      } catch (e) {
+                                        print('Error loading previous page: $e');
+                                      } finally {
+                                        if (mounted) {
+                                          setState(() {
+                                            _isLoadingPrevPage = false;
+                                          });
+                                        }
+                                      }
                                       },
                               ),
                             ],
