@@ -1,6 +1,7 @@
 import '/auth/custom_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/app_state.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -312,11 +313,34 @@ class _MenuWidgetState extends State<MenuWidget> {
                     hoverColor: Colors.transparent,
                     highlightColor: Colors.transparent,
                     onTap: () async {
-                      GoRouter.of(context).prepareAuthEvent();
-                      await authManager.signOut();
-                      GoRouter.of(context).clearRedirectLocation();
+                      try {
+                        // Clear the app state first
+                        FFAppState().resetAppState();
+                        
+                        // Force a UI update to reflect the cleared state
+                        if (mounted) {
+                          setState(() {});
+                        }
+                        
+                        // Add a small delay to ensure UI updates
+                        await Future.delayed(Duration(milliseconds: 100));
+                        
+                        // Then sign out
+                        GoRouter.of(context).prepareAuthEvent();
+                        await authManager.signOut();
+                        GoRouter.of(context).clearRedirectLocation();
 
-                      context.goNamedAuth('Login', context.mounted);
+                        // Navigate to login
+                        if (mounted) {
+                          context.goNamedAuth('Login', context.mounted);
+                        }
+                      } catch (e) {
+                        print('Error during sign out: $e');
+                        // Still try to navigate to login even if there was an error
+                        if (mounted) {
+                          context.goNamedAuth('Login', context.mounted);
+                        }
+                      }
                     },
                     child: Container(
                       decoration: BoxDecoration(),

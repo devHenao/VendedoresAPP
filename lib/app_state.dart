@@ -123,6 +123,61 @@ class FFAppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Reset all app state when user logs out
+  void resetAppState() {
+    // Reset all the state variables to their initial values
+    _Nit = '';
+    _Email = '';
+    _Remember = false;
+    _infoSeller = DataSellerStruct();
+    _itemId = -1; // Set to -1 to indicate no client selected
+    
+    // Create a completely empty client structure
+    _dataCliente = DataClienteStruct.fromSerializableMap({
+      'nombre': '',
+      'nit': '',
+      'email': '',
+      'telefono': '',
+      'direccion': '',
+      'codprecio': '',
+      'limitecredito': 0.0,
+      'saldo': 0.0,
+      'diascredito': 0,
+      'cupo_disponible': 0.0,
+      'tipo_cliente': '',
+      'ciudad': '',
+      'departamento': '',
+      'pais': '',
+      'vendedor': '',
+      'ruta': '',
+      'bloqueado': false,
+      'fecha_ingreso': '',
+      'ultima_compra': '',
+      'comentarios': '',
+    });
+    
+    _productList = [];
+    _dataProductList = [];
+    _shoppingCart = [];
+    
+    // Clear all persisted data from SharedPreferences
+    prefs.remove('ff_Nit');
+    prefs.remove('ff_Email');
+    prefs.remove('ff_Remember');
+    prefs.remove('ff_infoSeller');
+    prefs.remove('ff_itemId');
+    prefs.remove('ff_dataCliente');
+    prefs.remove('ff_productList');
+    prefs.remove('ff_dataProductList');
+    prefs.remove('ff_shoppingCart');
+    
+    // Force save the empty client data
+    dataCliente = _dataCliente;
+    
+    // Notify listeners to update the UI
+    notifyListeners();
+  }
+
   late SharedPreferences prefs;
 
   String _Nit = '';
