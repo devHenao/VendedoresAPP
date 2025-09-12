@@ -364,7 +364,19 @@ class _ClientesWidgetState extends State<ClientesWidget>
                               ),
                               // Filtros de fecha
                               Padding(
-                                padding: EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 8.0),
+                                padding: EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 4.0),
+                                child: Text(
+                                  'Selecciona el rango de fechas para filtrar los reportes',
+                                  style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                    fontFamily: 'Manrope',
+                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                    fontSize: 12.0,
+                                    letterSpacing: 0.0,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 8.0),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
@@ -978,6 +990,8 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                                                           .infoSeller
                                                                           .token,
                                                                       listaClientesItem.nit,
+                                                                      startDate: _model.fechaInicio,
+                                                                      endDate: _model.fechaFin,
                                                                     );
                                                                   },
                                                                 ),
@@ -1020,6 +1034,8 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                                                           .infoSeller
                                                                           .token,
                                                                       listaClientesItem.nit,
+                                                                      startDate: _model.fechaInicio,
+                                                                      endDate: _model.fechaFin,
                                                                     );
                                                                   },
                                                                 ),
@@ -1063,6 +1079,8 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                                                           .infoSeller
                                                                           .token,
                                                                       listaClientesItem.nit,
+                                                                      startDate: _model.fechaInicio,
+                                                                      endDate: _model.fechaFin,
                                                                     );
                                                                   },
                                                                 ),
@@ -1474,6 +1492,8 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                                                           .token,
                                                                       listaClientesItem
                                                                           .nit,
+                                                                      startDate: _model.fechaInicio,
+                                                                      endDate: _model.fechaFin,
                                                                     );
                                                                   },
                                                                 ),
@@ -1507,6 +1527,8 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                                                           .token,
                                                                       listaClientesItem
                                                                           .nit,
+                                                                      startDate: _model.fechaInicio,
+                                                                      endDate: _model.fechaFin,
                                                                     );
                                                                   },
                                                                 ),
@@ -1541,6 +1563,8 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                                                           .token,
                                                                       listaClientesItem
                                                                           .nit,
+                                                                      startDate: _model.fechaInicio,
+                                                                      endDate: _model.fechaFin,
                                                                     );
                                                                   },
                                                                 ),
