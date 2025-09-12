@@ -29,6 +29,7 @@ class ProductosWidget extends StatefulWidget {
 
 class _ProductosWidgetState extends State<ProductosWidget> {
   late ProductosModel _model;
+  bool _isLoadingNextPage = false;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -848,7 +849,7 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                       ].divide(SizedBox(width: 5.0)),
                     ),
                   ),
-                if (_model.hasProduct == true)
+                if (_model.hasProduct == true || _isLoadingNextPage)
                   Padding(
                     padding: EdgeInsets.all(24.0),
                     child: Column(
@@ -863,7 +864,7 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                         ),
                         SizedBox(height: 16.0),
                         Text(
-                          'Buscando productos...',
+                          _isLoadingNextPage ? 'Cargando más productos...' : 'Buscando productos...',
                           style: FlutterFlowTheme.of(context).titleSmall.override(
                                 fontFamily: 'Manrope',
                                 color: FlutterFlowTheme.of(context).primary,
@@ -1312,30 +1313,43 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                 borderRadius: 8.0,
                                 buttonSize: 35.0,
                                 fillColor: FlutterFlowTheme.of(context).primary,
-                                disabledColor:
-                                    FlutterFlowTheme.of(context).alternate,
+                                disabledColor: FlutterFlowTheme.of(context).alternate,
                                 icon: Icon(
                                   Icons.navigate_next_rounded,
                                   color: FlutterFlowTheme.of(context).info,
                                   size: 20.0,
                                 ),
-                                onPressed: (_model.pages?.hasNextPage == false)
+                                onPressed: (_model.pages?.hasNextPage == false || _isLoadingNextPage)
                                     ? null
                                     : () async {
-                                        _model.apiResultNextPages =
-                                            await ProductsGroup
-                                                .postListProductByCodPrecioCall
-                                                .call(
-                                          token: FFAppState().infoSeller.token,
-                                          pageNumber:
-                                              _model.pages!.currentPage + 1,
-                                          pageSize: 10,
-                                          filter: _model
-                                              .txtBuscarTextController.text,
-                                          codprecio: FFAppState()
-                                              .dataCliente
-                                              .codprecio,
-                                        );
+                                              setState(() {
+                                                _isLoadingNextPage = true;
+                                              });
+                                              
+                                              try {
+                                                _model.apiResultNextPages =
+                                                    await ProductsGroup
+                                                        .postListProductByCodPrecioCall
+                                                        .call(
+                                                  token: FFAppState().infoSeller.token,
+                                                  pageNumber:
+                                                      _model.pages!.currentPage + 1,
+                                                  pageSize: 10,
+                                                  filter: _model
+                                                      .txtBuscarTextController.text,
+                                                  codprecio: FFAppState()
+                                                      .dataCliente
+                                                      .codprecio,
+                                                );
+                                              } catch (e) {
+                                                print('Error loading next page: $e');
+                                              } finally {
+                                                if (mounted) {
+                                                  setState(() {
+                                                    _isLoadingNextPage = false;
+                                                  });
+                                                }
+                                              }
 
                                         if ((_model.apiResultNextPages
                                                 ?.succeeded ??
