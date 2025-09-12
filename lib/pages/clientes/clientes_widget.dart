@@ -387,12 +387,44 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                             context: context,
                                             initialDate: _model.fechaInicio ?? DateTime.now(),
                                             firstDate: DateTime(2000),
-                                            lastDate: DateTime(2100),
+                                            lastDate: _model.fechaFin ?? DateTime(2100),
+                                            helpText: 'Seleccione fecha inicial',
+                                            builder: (context, child) {
+                                              return Theme(
+                                                data: Theme.of(context).copyWith(
+                                                  colorScheme: ColorScheme.light(
+                                                    primary: FlutterFlowTheme.of(context).primary,
+                                                    onPrimary: Colors.white,
+                                                    surface: Colors.white,
+                                                    onSurface: Colors.black,
+                                                  ),
+                                                ),
+                                                child: child!,
+                                              );
+                                            },
                                           );
                                           if (date != null) {
-                                            setState(() {
-                                              _model.fechaInicio = date;
-                                            });
+                                            if (_model.fechaFin != null && date.isAfter(_model.fechaFin!)) {
+                                              await showDialog(
+                                                context: context,
+                                                builder: (alertDialogContext) {
+                                                  return AlertDialog(
+                                                    title: Text('Fecha inválida'),
+                                                    content: Text('La fecha inicial no puede ser posterior a la fecha final.'),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () => Navigator.pop(alertDialogContext),
+                                                        child: Text('Aceptar'),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            } else {
+                                              setState(() {
+                                                _model.fechaInicio = date;
+                                              });
+                                            }
                                           }
                                         },
                                         child: Container(
@@ -428,14 +460,46 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                         onTap: () async {
                                           final date = await showDatePicker(
                                             context: context,
-                                            initialDate: _model.fechaFin ?? DateTime.now(),
-                                            firstDate: DateTime(2000),
+                                            initialDate: _model.fechaFin ?? (_model.fechaInicio ?? DateTime.now()),
+                                            firstDate: _model.fechaInicio ?? DateTime(2000),
                                             lastDate: DateTime(2100),
+                                            helpText: 'Seleccione fecha final',
+                                            builder: (context, child) {
+                                              return Theme(
+                                                data: Theme.of(context).copyWith(
+                                                  colorScheme: ColorScheme.light(
+                                                    primary: FlutterFlowTheme.of(context).primary,
+                                                    onPrimary: Colors.white,
+                                                    surface: Colors.white,
+                                                    onSurface: Colors.black,
+                                                  ),
+                                                ),
+                                                child: child!,
+                                              );
+                                            },
                                           );
                                           if (date != null) {
-                                            setState(() {
-                                              _model.fechaFin = date;
-                                            });
+                                            if (_model.fechaInicio != null && date.isBefore(_model.fechaInicio!)) {
+                                              await showDialog(
+                                                context: context,
+                                                builder: (alertDialogContext) {
+                                                  return AlertDialog(
+                                                    title: Text('Fecha inválida'),
+                                                    content: Text('La fecha final no puede ser anterior a la fecha inicial.'),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () => Navigator.pop(alertDialogContext),
+                                                        child: Text('Aceptar'),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            } else {
+                                              setState(() {
+                                                _model.fechaFin = date;
+                                              });
+                                            }
                                           }
                                         },
                                         child: Container(
