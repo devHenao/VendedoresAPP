@@ -41,6 +41,70 @@ class _ProductosWidgetState extends State<ProductosWidget> {
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       FFAppState().product = true;
       FFAppState().update(() {});
+      
+      // Load products on page load
+      _model.buscar = ''; // Empty search to get all products
+      _model.apiResultaListProductsSubmit =
+          await ProductsGroup.postListProductByCodPrecioCall.call(
+        token: FFAppState().infoSeller.token,
+        codprecio: FFAppState().dataCliente.codprecio,
+        pageNumber: 1,
+        pageSize: 10,
+        filter: _model.buscar,
+      );
+
+      if ((_model.apiResultaListProductsSubmit?.succeeded ?? true)) {
+        _model.resultadoProductoCacheSubmit =
+            await actions.actualizarListaProductosCache(
+          (getJsonField(
+            (_model.apiResultaListProductsSubmit?.jsonBody ?? ''),
+            r'''$.data.data''',
+            true,
+          )!
+                  .toList()
+                  .map<DataProductStruct?>(
+                      DataProductStruct.maybeFromMap)
+                  .toList()
+              as Iterable<DataProductStruct?>) 
+              .withoutNulls
+              .toList(),
+          FFAppState().shoppingCart.toList(),
+          _model.buscar,
+        );
+        FFAppState().productList = _model
+            .resultadoProductoCacheSubmit!
+            .toList()
+            .cast<DataProductStruct>();
+        FFAppState().update(() {});
+        _model.pages = DataPageStruct.maybeFromMap(
+          getJsonField(
+            (_model.apiResultaListProductsSubmit?.jsonBody ?? ''),
+            r'''$.data''',
+          ),
+        );
+        safeSetState(() {});
+      } else {
+        await showDialog(
+          context: context,
+          builder: (alertDialogContext) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text(
+                getJsonField(
+                  (_model.apiResultaListProductsSubmit?.jsonBody ?? ''),
+                  r'''$.data''',
+                ).toString(),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(alertDialogContext),
+                  child: Text('Ok'),
+                ),
+              ],
+            );
+          },
+        );
+      }
     });
 
     _model.txtBuscarTextController ??= TextEditingController();
