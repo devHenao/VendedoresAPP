@@ -442,8 +442,9 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                     icon: Icon(
                                       Icons.search_rounded,
                                       color: FlutterFlowTheme.of(context).info,
-                                      size: 24.0,
+                                      size: 30.0,
                                     ),
+                                    showLoadingIndicator: true,
                                     onPressed: () async {
                                       if (_model.txtBuscarTextController.text !=
                                               null &&
