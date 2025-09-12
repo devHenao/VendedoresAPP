@@ -30,6 +30,7 @@ class ProductosModel extends FlutterFlowModel<ProductosWidget> {
   }
 
   bool hasProduct = true;
+  bool isSearching = false;
 
   ///  State fields for stateful widgets in this page.
 
