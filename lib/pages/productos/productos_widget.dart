@@ -75,6 +75,7 @@ class _ProductosWidgetState extends State<ProductosWidget> {
             .resultadoProductoCacheSubmit!
             .toList()
             .cast<DataProductStruct>();
+        _model.hasProduct = false;
         FFAppState().update(() {});
         _model.pages = DataPageStruct.maybeFromMap(
           getJsonField(
@@ -318,7 +319,9 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                                 .resultadoProductoCacheSubmit!
                                                 .toList()
                                                 .cast<DataProductStruct>();
+                                            _model.hasProduct = false;
                                             FFAppState().update(() {});
+                                            safeSetState(() {});
                                             _model.pages =
                                                 DataPageStruct.maybeFromMap(
                                                     getJsonField(
@@ -495,6 +498,8 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                               .resultadoProductoCacheBoton!
                                               .toList()
                                               .cast<DataProductStruct>();
+                                          _model.hasProduct = false;
+                                          safeSetState(() {});
                                           FFAppState().update(() {});
                                           _model.pages =
                                               DataPageStruct.maybeFromMap(
@@ -576,6 +581,8 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                               .resultadoProductoCacheBotonVacio!
                                               .toList()
                                               .cast<DataProductStruct>();
+                                          _model.hasProduct = false;
+                                          safeSetState(() {});
                                           FFAppState().update(() {});
                                           _model.pages =
                                               DataPageStruct.maybeFromMap(
@@ -613,8 +620,6 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                       }
 
                                       _model.hasProduct = false;
-                                      safeSetState(() {});
-
                                       safeSetState(() {});
                                     },
                                   ),
@@ -685,6 +690,8 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                               .resultadoProductoCacheScan!
                                               .toList()
                                               .cast<DataProductStruct>();
+                                          _model.hasProduct = false;
+                                          safeSetState(() {});
                                           FFAppState().update(() {});
                                           if ((FFAppState()
                                                   .productList
@@ -736,8 +743,6 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                       }
 
                                       _model.hasProduct = false;
-                                      safeSetState(() {});
-
                                       safeSetState(() {});
                                     },
                                   ),
@@ -842,20 +847,30 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                     ),
                   ),
                 if (_model.hasProduct == true)
-                  Row(
+                  Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            FlutterFlowTheme.of(context).primary,
+                          ),
+                        ),
+                      ),
                       Text(
-                        'Busca el producto que deseas',
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
+                        'Cargando productos...',
+                        style: FlutterFlowTheme.of(context).titleSmall.override(
                               fontFamily: 'Manrope',
-                              fontSize: 18.0,
+                              color: FlutterFlowTheme.of(context).primary,
+                              fontSize: 20.0,
                               letterSpacing: 0.0,
                               fontWeight: FontWeight.bold,
                             ),
-                      ),
-                    ].divide(SizedBox(width: 2.0)),
+                      )
+                    ],
                   ),
                 if ((FFAppState().product == false) &&
                     !(FFAppState().productList.isNotEmpty))
