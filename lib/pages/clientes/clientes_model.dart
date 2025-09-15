@@ -36,6 +36,7 @@ class ClientesModel extends FlutterFlowModel<ClientesWidget> {
   String? search;
 
   bool hasClientes = true;
+  bool isLoadingSearch = false;
   
   // Filtros de fecha
   DateTime? fechaInicio;

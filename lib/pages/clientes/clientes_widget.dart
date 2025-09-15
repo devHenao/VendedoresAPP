@@ -270,16 +270,23 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                           controller:
                                               _model.txtSearchTextController,
                                           focusNode: _model.txtSearchFocusNode,
-                                          onChanged: (_) =>
-                                              EasyDebounce.debounce(
-                                            '_model.txtSearchTextController',
-                                            Duration(milliseconds: 2000),
-                                            () async {
-                                              _model.search = _model
-                                                  .txtSearchTextController.text;
-                                              safeSetState(() {});
-                                            },
-                                          ),
+                                          onChanged: (_) {
+                                            final searchText = _model.txtSearchTextController.text;
+                                            _model.search = searchText;
+                                            _model.isLoadingSearch = searchText.isNotEmpty;
+                                            safeSetState(() {});
+                                            
+                                            EasyDebounce.debounce(
+                                              '_model.txtSearchTextController',
+                                              Duration(milliseconds: 1000),
+                                              () async {
+                                                if (mounted) {
+                                                  _model.isLoadingSearch = false;
+                                                  safeSetState(() {});
+                                                }
+                                              },
+                                            );
+                                          },
                                           autofocus: false,
                                           obscureText: false,
                                           decoration: InputDecoration(
@@ -561,25 +568,32 @@ class _ClientesWidgetState extends State<ClientesWidget>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (((_model.clientes.isNotEmpty) != true) &&
-                          (_model.hasClientes == true))
-                        Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      if (((_model.clientes.isNotEmpty) != true && _model.hasClientes == true) ||
+                          _model.isLoadingSearch)
+                        Column(
                           children: [
+                            SizedBox(height: 20),
+                            CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                FlutterFlowTheme.of(context).primary,
+                              ),
+                            ),
+                            SizedBox(height: 10),
                             Text(
-                              'Cargando...',
+                              _model.isLoadingSearch 
+                                  ? 'Buscando clientes...' 
+                                  : 'Cargando...',
                               style: FlutterFlowTheme.of(context)
                                   .titleSmall
                                   .override(
                                     fontFamily: 'Manrope',
                                     color: FlutterFlowTheme.of(context).primary,
-                                    fontSize: 20.0,
+                                    fontSize: 16.0,
                                     letterSpacing: 0.0,
                                     fontWeight: FontWeight.bold,
                                   ),
-                            ).animateOnPageLoad(
-                                animationsMap['textOnPageLoadAnimation']!),
+                            ),
+                            SizedBox(height: 20),
                           ],
                         ),
                       if (!_model.hasClientes)
