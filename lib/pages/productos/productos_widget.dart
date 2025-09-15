@@ -56,27 +56,52 @@ class _ProductosWidgetState extends State<ProductosWidget> {
       );
 
       if ((_model.apiResultaListProductsSubmit?.succeeded ?? true)) {
-        _model.resultadoProductoCacheSubmit =
-            await actions.actualizarListaProductosCache(
-          (getJsonField(
-            (_model.apiResultaListProductsSubmit?.jsonBody ?? ''),
-            r'''$.data.data''',
-            true,
-          )!
-                  .toList()
-                  .map<DataProductStruct?>(
-                      DataProductStruct.maybeFromMap)
-                  .toList()
-              as Iterable<DataProductStruct?>) 
-              .withoutNulls
-              .toList(),
-          FFAppState().shoppingCart.toList(),
-          _model.buscar,
-        );
-        FFAppState().productList = _model
-            .resultadoProductoCacheSubmit!
+        // Get the current shopping cart to preserve quantities
+        final currentCart = FFAppState().shoppingCart.toList();
+        
+        // Parse the API response
+        final apiProducts = (getJsonField(
+          (_model.apiResultaListProductsSubmit?.jsonBody ?? ''),
+          r'''$.data.data''',
+          true,
+        )!
             .toList()
-            .cast<DataProductStruct>();
+            .map<DataProductStruct?>(DataProductStruct.maybeFromMap)
+            .toList() as Iterable<DataProductStruct?>
+        ).withoutNulls.toList();
+
+        // Create a map of product codes to their quantities from the cart
+        final cartQuantities = <String, double>{};
+        for (final item in currentCart) {
+          if (item.codigo.isNotEmpty) {
+            cartQuantities[item.codigo] = item.cantidad;
+          }
+        }
+
+        // Create a new list with updated quantities
+        final updatedProducts = <DataProductStruct>[];
+        for (final product in apiProducts) {
+          if (cartQuantities.containsKey(product.codproduc)) {
+            updatedProducts.add(DataProductStruct(
+              codproduc: product.codproduc,
+              descripcio: product.descripcio,
+              precio: product.precio,
+              saldo: product.saldo,
+              unidadmed: product.unidadmed,
+              iva: product.iva,
+              codtariva: product.codtariva,
+              selected: true,
+              cantidad: cartQuantities[product.codproduc] ?? 0.0,
+              codbarras: product.codbarras,
+            ));
+          } else {
+            updatedProducts.add(product);
+          }
+        }
+
+        // Update the product list with preserved quantities
+        _model.resultadoProductoCacheSubmit = updatedProducts;
+        FFAppState().productList = updatedProducts;
         _model.hasProduct = false;
         FFAppState().update(() {});
         _model.pages = DataPageStruct.maybeFromMap(
