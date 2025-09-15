@@ -435,23 +435,26 @@ class _ItemProductDetailWidgetState extends State<ItemProductDetailWidget> {
                               borderRadius: 15.0,
                               buttonSize: 30.0,
                               fillColor: FlutterFlowTheme.of(context).primary,
+                              disabledColor: FlutterFlowTheme.of(context).alternate,
                               icon: Icon(
                                 Icons.add_rounded,
                                 color: FlutterFlowTheme.of(context).info,
                                 size: 15.0,
                               ),
-                              onPressed: () async {
-                                _model.contador = (_model.contador!) + 1;
-                                safeSetState(() {});
-                                safeSetState(() {
-                                  _model.amountTextController?.text =
-                                      _model.contador!.toString();
-                                });
-                                await widget.callbackCantidad?.call(
-                                  double.tryParse(
-                                      _model.amountTextController.text),
-                                );
-                              },
+                              onPressed: (widget.itemList?.saldo ?? 0) <= 0
+                                  ? null
+                                  : () async {
+                                      _model.contador = (_model.contador!) + 1;
+                                      safeSetState(() {});
+                                      safeSetState(() {
+                                        _model.amountTextController?.text =
+                                            _model.contador!.toString();
+                                      });
+                                      await widget.callbackCantidad?.call(
+                                        double.tryParse(
+                                            _model.amountTextController.text),
+                                      );
+                                    },
                             ),
                           ],
                         ),
