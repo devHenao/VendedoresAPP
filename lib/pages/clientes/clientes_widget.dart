@@ -287,6 +287,10 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                               },
                                             );
                                           },
+                                          onTap: () {
+                                            // Forzar la actualización del estado cuando se hace tap en el campo
+                                            safeSetState(() {});
+                                          },
                                           autofocus: false,
                                           obscureText: false,
                                           decoration: InputDecoration(
@@ -307,6 +311,24 @@ class _ClientesWidgetState extends State<ClientesWidget>
                                                       fontFamily: 'Manrope',
                                                       letterSpacing: 0.0,
                                                     ),
+                                            suffixIcon: _model.txtSearchTextController.text.isNotEmpty &&
+                                                    _model.txtSearchFocusNode?.hasFocus == true
+                                                ? IconButton(
+                                                    icon: Icon(
+                                                      Icons.clear,
+                                                      color: FlutterFlowTheme.of(context).secondaryText,
+                                                      size: 20.0,
+                                                    ),
+                                                    onPressed: () {
+                                                      _model.txtSearchTextController?.clear();
+                                                      _model.search = '';
+                                                      _model.isLoadingSearch = false;
+                                                      // Mover el foco al campo después de limpiar
+                                                      _model.txtSearchFocusNode?.requestFocus();
+                                                      safeSetState(() {});
+                                                    },
+                                                  )
+                                                : null,
                                             enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                 color:
