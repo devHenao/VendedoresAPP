@@ -297,7 +297,7 @@ class _ItemProductDetailWidgetState extends State<ItemProductDetailWidget> {
                                 color: FlutterFlowTheme.of(context).info,
                                 size: 15.0,
                               ),
-                              onPressed: (_model.contador! <= 1.0)
+                              onPressed: (_model.contador! <= 0.0)
                                   ? null
                                   : () async {
                                       _model.contador = (_model.contador!) - 1;
