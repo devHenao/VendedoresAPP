@@ -361,6 +361,10 @@ class _ProductosWidgetState extends State<ProductosWidget> {
 
                                           safeSetState(() {});
                                         },
+                                        onTap: () {
+                                          // Forzar la actualización del estado cuando se hace tap en el campo
+                                          safeSetState(() {});
+                                        },
                                         autofocus: false,
                                         obscureText: false,
                                         decoration: InputDecoration(
@@ -381,6 +385,62 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                                     fontFamily: 'Manrope',
                                                     letterSpacing: 0.0,
                                                   ),
+                                          suffixIcon: _model.txtBuscarTextController.text.isNotEmpty &&
+                                                  _model.txtBuscarFocusNode?.hasFocus == true
+                                              ? IconButton(
+                                                  icon: Icon(
+                                                    Icons.clear,
+                                                    color: FlutterFlowTheme.of(context).secondaryText,
+                                                    size: 20.0,
+                                                  ),
+                                                  onPressed: () async {
+                                                    _model.txtBuscarTextController?.clear();
+                                                    _model.buscar = '';
+                                                    safeSetState(() {});
+                                                    
+                                                    // Realizar la búsqueda con el campo vacío
+                                                    _model.hasProduct = true;
+                                                    safeSetState(() {});
+                                                    
+                                                    _model.apiResultaListProductsSubmit =
+                                                        await ProductsGroup.postListProductByCodPrecioCall.call(
+                                                      token: FFAppState().infoSeller.token,
+                                                      codprecio: FFAppState().dataCliente.codprecio,
+                                                      pageNumber: 1,
+                                                      pageSize: 10,
+                                                      filter: _model.buscar,
+                                                    );
+
+                                                    if ((_model.apiResultaListProductsSubmit?.succeeded ?? true)) {
+                                                      _model.resultadoProductoCacheSubmit =
+                                                          await actions.actualizarListaProductosCache(
+                                                        (getJsonField(
+                                                          (_model.apiResultaListProductsSubmit?.jsonBody ?? ''),
+                                                          r'''$.data.data''',
+                                                          true,
+                                                        )!.toList().map<DataProductStruct?>(DataProductStruct.maybeFromMap).toList() as Iterable<DataProductStruct?>)
+                                                            .withoutNulls
+                                                            .toList(),
+                                                        FFAppState().shoppingCart.toList(),
+                                                        _model.buscar,
+                                                      );
+                                                      FFAppState().productList = _model.resultadoProductoCacheSubmit!.toList().cast<DataProductStruct>();
+                                                      _model.hasProduct = false;
+                                                      FFAppState().update(() {});
+                                                      _model.pages = DataPageStruct.maybeFromMap(
+                                                        getJsonField(
+                                                          (_model.apiResultaListProductsSubmit?.jsonBody ?? ''),
+                                                          r'''$.data''',
+                                                        ),
+                                                      );
+                                                    }
+                                                    
+                                                    // Mover el foco al campo después de limpiar
+                                                    _model.txtBuscarFocusNode?.requestFocus();
+                                                    safeSetState(() {});
+                                                  },
+                                                )
+                                              : null,
                                           enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                               color:
