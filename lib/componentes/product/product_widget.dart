@@ -203,45 +203,63 @@ class _ProductWidgetState extends State<ProductWidget> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        InkWell(
-                          splashColor: Colors.transparent,
-                          focusColor: Colors.transparent,
-                          hoverColor: Colors.transparent,
-                          highlightColor: Colors.transparent,
-                          onTap: () async {
-                            await widget.callBackSeleccionado?.call(
-                              true,
-                            );
-                            await widget.callbackCantidad?.call(
-                              1.0,
-                            );
-                            _model.contador = 1.0;
-                            _model.updatePage(() {});
-                            safeSetState(() {
-                              _model.amountTextController?.text =
-                                  _model.contador!.toString();
-                            });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  '¡El producto ha sido agregado al carrito!',
-                                  style: TextStyle(
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                  ),
-                                ),
-                                duration: Duration(milliseconds: 5000),
-                                backgroundColor:
-                                    FlutterFlowTheme.of(context).success,
+                        if (widget.saldo <= 0)
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+                            decoration: BoxDecoration(
+                              color: FlutterFlowTheme.of(context).error.withOpacity(0.9),
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            child: Text(
+                              'Sin Stock',
+                              style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                fontFamily: 'Manrope',
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12.0,
                               ),
-                            );
-                          },
-                          child: Icon(
-                            Icons.add_circle_sharp,
-                            color: FlutterFlowTheme.of(context).primary,
-                            size: 40.0,
+                            ),
+                          )
+                        else
+                          InkWell(
+                            splashColor: Colors.transparent,
+                            focusColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            onTap: () async {
+                              await widget.callBackSeleccionado?.call(
+                                true,
+                              );
+                              await widget.callbackCantidad?.call(
+                                1.0,
+                              );
+                              _model.contador = 1.0;
+                              _model.updatePage(() {});
+                              safeSetState(() {
+                                _model.amountTextController?.text =
+                                    _model.contador!.toString();
+                              });
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '¡El producto ha sido agregado al carrito!',
+                                    style: TextStyle(
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryBackground,
+                                    ),
+                                  ),
+                                  duration: Duration(milliseconds: 5000),
+                                  backgroundColor:
+                                      FlutterFlowTheme.of(context).success,
+                                ),
+                              );
+                            },
+                            child: Icon(
+                              Icons.add_circle_sharp,
+                              color: FlutterFlowTheme.of(context).primary,
+                              size: 40.0,
+                            ),
                           ),
-                        ),
                       ].divide(SizedBox(width: 15.0)),
                     ),
                   if (widget!.selecionado == true)
