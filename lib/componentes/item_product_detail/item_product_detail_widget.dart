@@ -436,25 +436,24 @@ class _ItemProductDetailWidgetState extends State<ItemProductDetailWidget> {
                               buttonSize: 30.0,
                               fillColor: FlutterFlowTheme.of(context).primary,
                               disabledColor: FlutterFlowTheme.of(context).alternate,
-                              icon: Icon(
-                                Icons.add_rounded,
-                                color: FlutterFlowTheme.of(context).info,
-                                size: 15.0,
-                              ),
-                              onPressed: (widget.itemList?.saldo ?? 0) <= 0
+                              onPressed: (widget.itemList?.saldo ?? 0) <= 0 ||
+                                      (_model.contador ?? 0) >= (widget.itemList?.saldo ?? 0)
                                   ? null
                                   : () async {
-                                      _model.contador = (_model.contador!) + 1;
-                                      safeSetState(() {});
+                                      _model.contador = (_model.contador ?? 0) + 1;
                                       safeSetState(() {
                                         _model.amountTextController?.text =
                                             _model.contador!.toString();
                                       });
                                       await widget.callbackCantidad?.call(
-                                        double.tryParse(
-                                            _model.amountTextController.text),
+                                        _model.contador,
                                       );
                                     },
+                              icon: Icon(
+                                Icons.add_rounded,
+                                color: FlutterFlowTheme.of(context).info,
+                                size: 15.0,
+                              ),
                             ),
                           ],
                         ),
