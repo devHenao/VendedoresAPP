@@ -630,8 +630,9 @@ class _ProductWidgetState extends State<ProductWidget> {
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Builder(
-                            builder: (context) => InkWell(
+                          if (widget.saldo > 0)
+                            Builder(
+                              builder: (context) => InkWell(
                               splashColor: Colors.transparent,
                               focusColor: Colors.transparent,
                               hoverColor: Colors.transparent,
