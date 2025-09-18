@@ -307,12 +307,12 @@ class _ProductWidgetState extends State<ProductWidget> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        'La bodega no tiene saldo',
+                                        'La bodega no tiene saldo, debes elegir otra bodega desde el detalle',
                                         style: TextStyle(
                                           color: FlutterFlowTheme.of(context).secondaryBackground,
                                         ),
                                       ),
-                                      duration: Duration(milliseconds: 1000),
+                                      duration: Duration(milliseconds: 3000),
                                       backgroundColor: FlutterFlowTheme.of(context).error,
                                     ),
                                   );
@@ -455,12 +455,12 @@ class _ProductWidgetState extends State<ProductWidget> {
                                           ScaffoldMessenger.of(context).showSnackBar(
                                             SnackBar(
                                               content: Text(
-                                                'No se puede superar el saldo de la bodega',
+                                                'No se puede superar el saldo de la bodega, debes elegir otra bodega desde el detalle',
                                                 style: TextStyle(
                                                   color: FlutterFlowTheme.of(context).secondaryBackground,
                                                 ),
                                               ),
-                                              duration: Duration(milliseconds: 1000),
+                                              duration: Duration(milliseconds: 3000),
                                               backgroundColor: FlutterFlowTheme.of(context).error,
                                             ),
                                           );
@@ -596,12 +596,12 @@ class _ProductWidgetState extends State<ProductWidget> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          'No se puede superar el saldo de la bodega',
+                                          'No se puede superar el saldo de la bodega, debes elegir otra bodega desde el detalle',
                                           style: TextStyle(
                                             color: FlutterFlowTheme.of(context).secondaryBackground,
                                           ),
                                         ),
-                                        duration: Duration(milliseconds: 1000),
+                                        duration: Duration(milliseconds: 3000),
                                         backgroundColor: FlutterFlowTheme.of(context).error,
                                       ),
                                     );
