@@ -388,6 +388,11 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget>
                                   FFAppState().store = _model.updatedStore!.toList().cast<DetailProductStruct>();
                                   FFAppState().update(() {});
 
+                                  if (listBodegasItem.bodega == FFAppState().infoSeller.storageDefault) {
+                                    _model.updatedQuantityForCallback = pCantidad;
+                                    _model.updatePage(() {});
+                                  }
+
                                   safeSetState(() {});
                                 },
                                 callbackEliminarBodega: () async {
@@ -520,7 +525,7 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget>
                             alignment: AlignmentDirectional(0.0, -1.0),
                             child: FFButtonWidget(
                               onPressed: () async {
-                                Navigator.pop(context);
+                                Navigator.pop(context, _model.updatedQuantityForCallback);
                               },
                               text: 'Cerrar',
                               icon: Icon(

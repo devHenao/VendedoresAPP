@@ -45,14 +45,9 @@ class ProductDetailModel extends FlutterFlowModel<ProductDetailWidget> {
 
   ///  State fields for stateful widgets in this component.
 
-  List<DetailProductStruct>? updatedStore;
-  List<DetailProductStruct>? updatedStore2;
-  List<DetailProductStruct>? updatedStore3;
-  List<DetailProductStruct>? updatedStore4;
-
   // Stores action output result for [Backend Call - API (getListStorageByProduct)] action in ProductDetail widget.
   ApiCallResponse? apiResultDetail;
-  // Stores action output result for [Custom Action - actualizarListaProductosBodega] action in productDetail widget.
+  // Stores action output result for [Custom Action - actualizarListaProductosBodega] action in ProductDetail widget.
   List<DetailProductStruct>? resultadoBodega;
   // Models for ItemProductDetail dynamic component.
   late FlutterFlowDynamicModels<ItemProductDetailModel> itemProductDetailModels;
@@ -60,24 +55,26 @@ class ProductDetailModel extends FlutterFlowModel<ProductDetailWidget> {
   List<DetailProductStruct>? resultadoCantidad;
   // Stores action output result for [Custom Action - agregarProductoCarrito] action in ItemProductDetail widget.
   List<DetailProductStruct>? resultadoCarrito;
-  // Stores action output result for [Custom Action - modificarCantidadBodega] action in ItemProductDetail widget.
-  List<DetailProductStruct>? addCantidad;
-  // Stores action output result for [Custom Action - seleccionarProducto] action in ItemProductDetail widget.
-  DataProductStruct? result;
-  // Stores action output result for [Custom Action - agregarProductoCarrito] action in ItemProductDetail widget.
-  List<DetailProductStruct>? listaAgregarProducto;
+  // Stores action output result for [Custom Action - updateStoreQuantity] action in ItemProductDetail widget.
+  List<DetailProductStruct>? updatedStore;
   // Stores action output result for [Custom Action - eliminarProductoCarrito] action in ItemProductDetail widget.
-  List<DetailProductStruct>? resultadoEliminarProducto;
+  List<DetailProductStruct>? resultadoEliminarBodega;
+  // Stores action output result for [Custom Action - updateStoreQuantity] action in ItemProductDetail widget.
+  List<DetailProductStruct>? updatedStore2;
+  // Stores action output result for [Custom Action - eliminarProductoCarrito] action in ItemProductDetail widget.
+  List<DetailProductStruct>? resultadoEliminarBodega2;
+  // Stores action output result for [Custom Action - updateStoreQuantity] action in ItemProductDetail widget.
+  List<DetailProductStruct>? updatedStore3;
   // Stores action output result for [Custom Action - seleccionarProducto] action in ItemProductDetail widget.
   DataProductStruct? resultBodega;
   // Stores action output result for [Custom Action - agregarProductoCarrito] action in ItemProductDetail widget.
   List<DetailProductStruct>? addProduct;
-  // Stores action output result for [Custom Action - eliminarProductoCarrito] action in ItemProductDetail widget.
-  List<DetailProductStruct>? resultadoEliminarBodega;
-  // Stores action output result for [Custom Action - eliminarProductoCarrito] action in ItemProductDetail widget.
-  List<DetailProductStruct>? resultadoEliminarBodega2;
+  // Stores action output result for [Custom Action - updateStoreQuantity] action in ItemProductDetail widget.
+  List<DetailProductStruct>? updatedStore4;
   // Stores action output result for [Custom Action - deleteProduct] action in ItemProductDetail widget.
   List<DetailProductStruct>? deleteProduct;
+  // Local state field to hold the updated quantity from the seller's default storage.
+  double? updatedQuantityForCallback;
 
   @override
   void initState(BuildContext context) {

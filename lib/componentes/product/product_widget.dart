@@ -637,7 +637,7 @@ class _ProductWidgetState extends State<ProductWidget> {
                               hoverColor: Colors.transparent,
                               highlightColor: Colors.transparent,
                               onTap: () async {
-                                await showDialog(
+                                final result = await showDialog<double>(
                                   context: context,
                                   builder: (dialogContext) {
                                     return Dialog(
@@ -656,6 +656,15 @@ class _ProductWidgetState extends State<ProductWidget> {
                                     );
                                   },
                                 );
+
+                                if (result != null) {
+                                  _model.contador = result;
+                                  _model.updatePage(() {});
+                                  safeSetState(() {
+                                    _model.amountTextController?.text = result.toString();
+                                  });
+                                  await widget.callbackCantidad?.call(result);
+                                }
                               },
                               child: Icon(
                                 Icons.list,
