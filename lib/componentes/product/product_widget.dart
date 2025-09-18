@@ -658,12 +658,18 @@ class _ProductWidgetState extends State<ProductWidget> {
                                 );
 
                                 if (result != null) {
-                                  _model.contador = result;
+                                  // If the product was not selected before, mark it as selected now.
+                                  if (!widget.selecionado!) {
+                                    await widget.callBackSeleccionado?.call(true);
+                                  }
+                                  
+                                  // Update quantity and UI
+                                  _model.contador = result > 0 ? result : 1.0;
                                   _model.updatePage(() {});
                                   safeSetState(() {
-                                    _model.amountTextController?.text = result.toString();
+                                    _model.amountTextController?.text = _model.contador.toString();
                                   });
-                                  await widget.callbackCantidad?.call(result);
+                                  await widget.callbackCantidad?.call(_model.contador);
                                 }
                               },
                               child: Icon(
