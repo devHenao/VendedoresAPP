@@ -298,7 +298,7 @@ class _ProductWidgetState extends State<ProductWidget> {
                                           color: FlutterFlowTheme.of(context).secondaryBackground,
                                         ),
                                       ),
-                                      duration: Duration(milliseconds: 5000),
+                                      duration: Duration(milliseconds: 1500),
                                       backgroundColor: FlutterFlowTheme.of(context).success,
                                     ),
                                   );
@@ -312,7 +312,7 @@ class _ProductWidgetState extends State<ProductWidget> {
                                           color: FlutterFlowTheme.of(context).secondaryBackground,
                                         ),
                                       ),
-                                      duration: Duration(milliseconds: 4000),
+                                      duration: Duration(milliseconds: 1000),
                                       backgroundColor: FlutterFlowTheme.of(context).error,
                                     ),
                                   );
@@ -382,7 +382,7 @@ class _ProductWidgetState extends State<ProductWidget> {
                                               .secondaryBackground,
                                         ),
                                       ),
-                                      duration: Duration(milliseconds: 3000),
+                                      duration: Duration(milliseconds: 1500),
                                       backgroundColor:
                                           FlutterFlowTheme.of(context).error,
                                     ),
@@ -460,7 +460,7 @@ class _ProductWidgetState extends State<ProductWidget> {
                                                   color: FlutterFlowTheme.of(context).secondaryBackground,
                                                 ),
                                               ),
-                                              duration: Duration(milliseconds: 4000),
+                                              duration: Duration(milliseconds: 1000),
                                               backgroundColor: FlutterFlowTheme.of(context).error,
                                             ),
                                           );
@@ -601,7 +601,7 @@ class _ProductWidgetState extends State<ProductWidget> {
                                             color: FlutterFlowTheme.of(context).secondaryBackground,
                                           ),
                                         ),
-                                        duration: Duration(milliseconds: 4000),
+                                        duration: Duration(milliseconds: 1000),
                                         backgroundColor: FlutterFlowTheme.of(context).error,
                                       ),
                                     );
