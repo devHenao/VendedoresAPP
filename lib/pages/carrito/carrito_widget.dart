@@ -794,7 +794,7 @@ class _CarritoWidgetState extends State<CarritoWidget> {
                                           .secondaryBackground,
                                     ),
                                   ),
-                                  duration: Duration(milliseconds: 5000),
+                                  duration: Duration(milliseconds: 3000),
                                   backgroundColor:
                                       FlutterFlowTheme.of(context).error,
                                   action: SnackBarAction(

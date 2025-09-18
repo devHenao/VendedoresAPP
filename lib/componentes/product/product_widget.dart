@@ -4,13 +4,13 @@ import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'dart:ui';
+import '/backend/api_requests/api_calls.dart';
 import '/flutter_flow/custom_functions.dart' as functions;
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'product_model.dart';
 export 'product_model.dart';
@@ -64,6 +64,32 @@ class _ProductWidgetState extends State<ProductWidget> {
       safeSetState(() {
         _model.amountTextController?.text = _model.contador!.toString();
       });
+
+      // If product is already selected, fetch its specific stock for validation.
+      if (widget.selecionado ?? false) {
+        _model.apiResultDetailProduct =
+            await ProductsGroup.getListStorageByProductCall.call(
+          token: FFAppState().infoSeller.token,
+          codprecio: FFAppState().dataCliente.codprecio,
+          codproduc: widget.productItem?.codproduc,
+        );
+        if (_model.apiResultDetailProduct?.succeeded ?? true) {
+          final bodegasJson = getJsonField(
+            (_model.apiResultDetailProduct?.jsonBody ?? ''),
+            r'''$.data''',
+            true,
+          );
+          final bodegas = (bodegasJson as List?)
+                  ?.map((e) => DetailProductStruct.maybeFromMap(e)!)
+                  .toList() ??
+              [];
+          _model.saldoBodegaVendedor = functions.getSaldoPorBodega(
+            FFAppState().infoSeller.storageDefault,
+            bodegas,
+          );
+          _model.updatePage(() {});
+        }
+      }
     });
 
     _model.amountTextController ??= TextEditingController(text: '1');
@@ -227,32 +253,88 @@ class _ProductWidgetState extends State<ProductWidget> {
                             hoverColor: Colors.transparent,
                             highlightColor: Colors.transparent,
                             onTap: () async {
-                              await widget.callBackSeleccionado?.call(
-                                true,
+                              // 1. Get stock details from API
+                              _model.apiResultDetailProduct =
+                                  await ProductsGroup.getListStorageByProductCall.call(
+                                token: FFAppState().infoSeller.token,
+                                codprecio: FFAppState().dataCliente.codprecio,
+                                codproduc: widget.productItem?.codproduc,
                               );
-                              await widget.callbackCantidad?.call(
-                                1.0,
-                              );
-                              _model.contador = 1.0;
-                              _model.updatePage(() {});
-                              safeSetState(() {
-                                _model.amountTextController?.text =
-                                    _model.contador!.toString();
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    '¡El producto ha sido agregado al carrito!',
-                                    style: TextStyle(
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryBackground,
+
+                              if ((_model.apiResultDetailProduct?.succeeded ?? true)) {
+                                // 2. Find the specific saldo for the seller's default bodega
+                                final bodegasJson = getJsonField(
+                                  (_model.apiResultDetailProduct?.jsonBody ?? ''),
+                                  r'''$.data''',
+                                  true,
+                                );
+                                final bodegas = (bodegasJson as List?)
+                                        ?.map((e) => DetailProductStruct.maybeFromMap(e)!)
+                                        .toList() ??
+                                    [];
+                                
+                                final saldoBodegaVendedor = functions.getSaldoPorBodega(
+                                  FFAppState().infoSeller.storageDefault,
+                                  bodegas,
+                                );
+
+                                // 3. Validate stock
+                                if (saldoBodegaVendedor > 0) {
+                                  // Stock is OK, save the stock limit and add to cart
+                                  _model.saldoBodegaVendedor = saldoBodegaVendedor;
+                                  _model.updatePage(() {});
+                                  await widget.callBackSeleccionado?.call(true);
+                                  await widget.callbackCantidad?.call(1.0);
+                                  _model.contador = 1.0;
+                                  _model.updatePage(() {});
+                                  safeSetState(() {
+                                    _model.amountTextController?.text = _model.contador!.toString();
+                                  });
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        '¡El producto ha sido agregado al carrito!',
+                                        style: TextStyle(
+                                          color: FlutterFlowTheme.of(context).secondaryBackground,
+                                        ),
+                                      ),
+                                      duration: Duration(milliseconds: 5000),
+                                      backgroundColor: FlutterFlowTheme.of(context).success,
                                     ),
-                                  ),
-                                  duration: Duration(milliseconds: 5000),
-                                  backgroundColor:
-                                      FlutterFlowTheme.of(context).success,
-                                ),
-                              );
+                                  );
+                                } else {
+                                  // No stock, show error message
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'La bodega no tiene saldo',
+                                        style: TextStyle(
+                                          color: FlutterFlowTheme.of(context).secondaryBackground,
+                                        ),
+                                      ),
+                                      duration: Duration(milliseconds: 4000),
+                                      backgroundColor: FlutterFlowTheme.of(context).error,
+                                    ),
+                                  );
+                                }
+                              } else {
+                                // API call failed, show generic error
+                                await showDialog(
+                                  context: context,
+                                  builder: (alertDialogContext) {
+                                    return AlertDialog(
+                                      title: Text('Error'),
+                                      content: Text('No se pudo verificar el stock del producto.'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(alertDialogContext),
+                                          child: Text('Ok'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
                             },
                             child: Icon(
                               Icons.add_circle_sharp,
@@ -300,7 +382,7 @@ class _ProductWidgetState extends State<ProductWidget> {
                                               .secondaryBackground,
                                         ),
                                       ),
-                                      duration: Duration(milliseconds: 5000),
+                                      duration: Duration(milliseconds: 3000),
                                       backgroundColor:
                                           FlutterFlowTheme.of(context).error,
                                     ),
@@ -365,18 +447,32 @@ class _ProductWidgetState extends State<ProductWidget> {
                                       '_model.amountTextController',
                                       Duration(milliseconds: 2000),
                                       () async {
-                                        _model.contador =
-                                            valueOrDefault<double>(
-                                          _model.amountTextController.text ==
-                                                      null ||
-                                                  _model.amountTextController
-                                                          .text ==
-                                                      ''
-                                              ? 1.0
-                                              : double.tryParse(_model
-                                                  .amountTextController.text),
-                                          1.0,
-                                        );
+                                        final enteredAmount = double.tryParse(_model.amountTextController.text) ?? 0.0;
+                                        final maxStock = _model.saldoBodegaVendedor ?? 0.0;
+
+                                        if (enteredAmount > maxStock) {
+                                          // Amount exceeds stock, show error and cap the amount
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'No se puede superar el saldo de la bodega',
+                                                style: TextStyle(
+                                                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                                                ),
+                                              ),
+                                              duration: Duration(milliseconds: 4000),
+                                              backgroundColor: FlutterFlowTheme.of(context).error,
+                                            ),
+                                          );
+                                          _model.contador = maxStock;
+                                          safeSetState(() {
+                                            _model.amountTextController?.text = maxStock.toString();
+                                          });
+                                        } else {
+                                          // Amount is valid
+                                          _model.contador = enteredAmount > 0 ? enteredAmount : 1.0;
+                                        }
+                                        
                                         _model.updatePage(() {});
                                         await widget.callbackCantidad?.call(
                                           _model.contador,
@@ -487,19 +583,29 @@ class _ProductWidgetState extends State<ProductWidget> {
                                   size: 15.0,
                                 ),
                                 onPressed: () async {
-                                  await widget.callBackSeleccionado?.call(
-                                    true,
-                                  );
-                                  _model.contador = (_model.contador!) + 1;
-                                  _model.updatePage(() {});
-                                  safeSetState(() {
-                                    _model.amountTextController?.text =
-                                        _model.contador!.toString();
-                                  });
-                                  await widget.callbackCantidad?.call(
-                                    double.tryParse(
-                                        _model.amountTextController.text),
-                                  );
+                                  if ((_model.contador!) + 1 <= (_model.saldoBodegaVendedor ?? 0)) {
+                                    _model.contador = (_model.contador!) + 1;
+                                    _model.updatePage(() {});
+                                    safeSetState(() {
+                                      _model.amountTextController?.text = _model.contador!.toString();
+                                    });
+                                    await widget.callbackCantidad?.call(
+                                      double.tryParse(_model.amountTextController.text),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'No se puede superar el saldo de la bodega',
+                                          style: TextStyle(
+                                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                                          ),
+                                        ),
+                                        duration: Duration(milliseconds: 4000),
+                                        backgroundColor: FlutterFlowTheme.of(context).error,
+                                      ),
+                                    );
+                                  }
                                 },
                               ),
                             ],

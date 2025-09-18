@@ -327,7 +327,7 @@ class _ItemShoppingCartWidgetState extends State<ItemShoppingCartWidget> {
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    duration: Duration(milliseconds: 5000),
+                                    duration: Duration(milliseconds: 3000),
                                     backgroundColor:
                                         FlutterFlowTheme.of(context).error,
                                   ),

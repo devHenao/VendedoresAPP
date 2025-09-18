@@ -75,3 +75,17 @@ double acumulate(
   }
   return sum;
 }
+
+double getSaldoPorBodega(
+  String codBodega,
+  List<DetailProductStruct> bodegas,
+) {
+  // Busca en la lista de bodegas y retorna el saldo para la bodega especificada.
+  for (var bodega in bodegas) {
+    if (bodega.bodega == codBodega) {
+      return bodega.saldo;
+    }
+  }
+  // Si no se encuentra la bodega, retorna 0.
+  return 0.0;
+}
