@@ -659,18 +659,25 @@ class _ProductWidgetState extends State<ProductWidget> {
                                 );
 
                                 if (result != null) {
-                                  // If the product was not selected before, mark it as selected now.
-                                  if (!widget.selecionado!) {
-                                    await widget.callBackSeleccionado?.call(true);
+                                  if (result > 0) {
+                                    // If the product was not selected before, mark it as selected now.
+                                    if (!widget.selecionado!) {
+                                      await widget.callBackSeleccionado?.call(true);
+                                    }
+
+                                    // Update quantity and UI
+                                    _model.contador = result;
+                                    _model.updatePage(() {});
+                                    safeSetState(() {
+                                      _model.amountTextController?.text = _model.contador.toString();
+                                    });
+                                    await widget.callbackCantidad?.call(_model.contador);
+                                  } else {
+                                    // If result is 0, deselect the product.
+                                    await widget.callBackSeleccionado?.call(false);
+                                    await widget.callbackCantidad?.call(0.0);
+                                    await widget.callbackEliminar?.call();
                                   }
-                                  
-                                  // Update quantity and UI
-                                  _model.contador = result > 0 ? result : 1.0;
-                                  _model.updatePage(() {});
-                                  safeSetState(() {
-                                    _model.amountTextController?.text = _model.contador.toString();
-                                  });
-                                  await widget.callbackCantidad?.call(_model.contador);
                                 }
                               },
                               child: Icon(
