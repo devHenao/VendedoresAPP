@@ -23,6 +23,8 @@ class ItemShoppingCartModel extends FlutterFlowModel<ItemShoppingCartWidget> {
   FocusNode? amountCartFocusNode;
   TextEditingController? amountCartTextController;
   String? Function(BuildContext, String?)? amountCartTextControllerValidator;
+  // Stores the stock limit for the specific warehouse of the cart item.
+  double? stockLimit;
 
   @override
   void initState(BuildContext context) {}

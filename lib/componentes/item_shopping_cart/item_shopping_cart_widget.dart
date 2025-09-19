@@ -2,16 +2,15 @@ import '/backend/schema/structs/index.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import 'dart:ui';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'item_shopping_cart_model.dart';
 export 'item_shopping_cart_model.dart';
+import '/backend/api_requests/api_calls.dart';
+import '/flutter_flow/custom_functions.dart' as functions;
 
 class ItemShoppingCartWidget extends StatefulWidget {
   const ItemShoppingCartWidget({
@@ -49,11 +48,38 @@ class _ItemShoppingCartWidgetState extends State<ItemShoppingCartWidget> {
 
     // On component load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      _model.contador = widget!.cantidad;
+      _model.contador = widget.cantidad;
       _model.updatePage(() {});
       safeSetState(() {
         _model.amountCartTextController?.text = _model.contador.toString();
       });
+
+      if (widget.articulo != null) {
+        // Fetch stock for the specific warehouse.
+        final apiResult = await ProductsGroup.getListStorageByProductCall.call(
+          token: FFAppState().infoSeller.token,
+          codprecio: FFAppState().dataCliente.codprecio,
+          codproduc: widget.articulo?.codigo,
+        );
+
+        if (apiResult.succeeded) {
+          final bodegasJson = getJsonField(
+            (apiResult.jsonBody ?? ''),
+            r'''$.data''',
+            true,
+          );
+          final bodegas = (bodegasJson as List?)
+                  ?.map((e) => DetailProductStruct.maybeFromMap(e)!)
+                  .toList() ??
+              [];
+          
+          _model.stockLimit = functions.getSaldoPorBodega(
+            widget.articulo!.bodega,
+            bodegas,
+          );
+          _model.updatePage(() {});
+        }
+      }
     });
 
     _model.amountCartTextController ??= TextEditingController(text: '1');
@@ -390,26 +416,31 @@ class _ItemShoppingCartWidgetState extends State<ItemShoppingCartWidget> {
                                     '_model.amountCartTextController',
                                     Duration(milliseconds: 2000),
                                     () async {
-                                      _model.contador = valueOrDefault<double>(
-                                        _model.amountCartTextController.text !=
-                                                    null &&
-                                                _model.amountCartTextController
-                                                        .text !=
-                                                    ''
-                                            ? double.tryParse(_model
-                                                .amountCartTextController.text)
-                                            : 1.0,
-                                        1.0,
-                                      );
-                                      _model.updatePage(() {});
+                                      final enteredAmount = double.tryParse(_model.amountCartTextController.text) ?? 0.0;
+                                      final maxStock = _model.stockLimit ?? double.infinity;
+
+                                      if (enteredAmount > maxStock) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'No se puede superar el saldo de la bodega ${widget.articulo?.bodega}',
+                                              style: TextStyle(
+                                                color: FlutterFlowTheme.of(context).secondaryBackground,
+                                              ),
+                                            ),
+                                            duration: Duration(milliseconds: 3000),
+                                            backgroundColor: FlutterFlowTheme.of(context).error,
+                                          ),
+                                        );
+                                        _model.contador = maxStock;
+                                      } else {
+                                        _model.contador = enteredAmount > 0 ? enteredAmount : 1.0;
+                                      }
+
                                       safeSetState(() {
-                                        _model.amountCartTextController?.text =
-                                            _model.contador!.toString();
+                                        _model.amountCartTextController?.text = _model.contador.toString();
                                       });
-                                      await widget.callbackCantidadCarrito
-                                          ?.call(
-                                        _model.contador,
-                                      );
+                                      await widget.callbackCantidadCarrito?.call(_model.contador);
                                     },
                                   ),
                                   autofocus: false,
@@ -506,18 +537,29 @@ class _ItemShoppingCartWidgetState extends State<ItemShoppingCartWidget> {
                                   color: FlutterFlowTheme.of(context).info,
                                   size: 15.0,
                                 ),
-                                onPressed: () async {
-                                  _model.contador = (_model.contador!) + 1;
-                                  _model.updatePage(() {});
-                                  safeSetState(() {
-                                    _model.amountCartTextController?.text =
-                                        _model.contador!.toString();
-                                  });
-                                  await widget.callbackCantidadCarrito?.call(
-                                    double.tryParse(
-                                        _model.amountCartTextController.text),
-                                  );
-                                },
+                                onPressed: (_model.contador ?? 0) >= (_model.stockLimit ?? double.infinity)
+                                    ? () {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'No se puede superar el saldo de la bodega ${widget.articulo?.bodega}',
+                                              style: TextStyle(
+                                                color: FlutterFlowTheme.of(context).secondaryBackground,
+                                              ),
+                                            ),
+                                            duration: Duration(milliseconds: 3000),
+                                            backgroundColor: FlutterFlowTheme.of(context).error,
+                                          ),
+                                        );
+                                      }
+                                    : () async {
+                                        _model.contador = (_model.contador ?? 0) + 1;
+                                        _model.updatePage(() {});
+                                        safeSetState(() {
+                                          _model.amountCartTextController?.text = _model.contador.toString();
+                                        });
+                                        await widget.callbackCantidadCarrito?.call(_model.contador);
+                                      },
                               ),
                             ],
                           ),
