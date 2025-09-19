@@ -235,7 +235,7 @@ class _ItemProductDetailWidgetState extends State<ItemProductDetailWidget> {
                                   ),
                                   Text(
                                     valueOrDefault<String>(
-                                      widget!.itemList?.saldo?.toString(),
+                                      widget!.itemList?.saldo.toString(),
                                       'saldo',
                                     ),
                                     style: FlutterFlowTheme.of(context)

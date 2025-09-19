@@ -1,17 +1,11 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:app_vendedores/backend/api_requests/_/api_manager.dart';
-
-import '../schema/structs/index.dart';
 
 import 'package:flutter/foundation.dart';
 
-import '/flutter_flow/flutter_flow_util.dart';
 import 'api_manager.dart';
 
-export 'api_manager.dart' show ApiCallResponse;
-
-const _kPrivateApiFunctionName = 'ffPrivateApiCall';
+export 'api_manager.dart';
 
 /// Start Auth Group Code
 
@@ -141,7 +135,7 @@ class ListClientByVendenCall {
 
 class UpdateClientCall {
   Future<ApiCallResponse> call({
-    dynamic? dataJson,
+    dynamic dataJson,
     String? token = '',
     String? enviroment = 'prod-appseller-ofima',
   }) async {
@@ -363,7 +357,7 @@ class GetListStorageByProductCall {
 class CreateOrderClientCall {
   Future<ApiCallResponse> call({
     String? nit = '',
-    dynamic? listProductsJson,
+    dynamic listProductsJson,
     String? token = '',
     String? enviroment = 'prod-appseller-ofima',
   }) async {
@@ -418,18 +412,6 @@ class ApiPagingParams {
 
 String _toEncodable(dynamic item) {
   return item;
-}
-
-String _serializeList(List? list) {
-  list ??= <String>[];
-  try {
-    return json.encode(list, toEncodable: _toEncodable);
-  } catch (_) {
-    if (kDebugMode) {
-      print("List serialization failed. Returning empty list.");
-    }
-    return '[]';
-  }
 }
 
 String _serializeJson(dynamic jsonVar, [bool isList = false]) {

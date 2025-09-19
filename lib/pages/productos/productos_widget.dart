@@ -25,7 +25,7 @@ class ProductosWidget extends StatefulWidget {
   State<ProductosWidget> createState() => _ProductosWidgetState();
 }
 
-class _ProductosWidgetState extends State<ProductosWidget> {
+class _ProductosWidgetState extends State<ProductosWidget> with WidgetsBindingObserver {
   late ProductosModel _model;
   bool _isLoadingNextPage = false;
   bool _isLoadingPrevPage = false;
@@ -36,99 +36,13 @@ class _ProductosWidgetState extends State<ProductosWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => ProductosModel());
+    WidgetsBinding.instance.addObserver(this);
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       FFAppState().product = true;
       FFAppState().update(() {});
-
-      // Load products on page load
-      _model.buscar = ''; // Empty search to get all products
-      _model.apiResultaListProductsSubmit =
-          await ProductsGroup.postListProductByCodPrecioCall.call(
-        token: FFAppState().infoSeller.token,
-        codprecio: FFAppState().dataCliente.codprecio,
-        pageNumber: 1,
-        pageSize: 10,
-        filter: _model.buscar,
-      );
-
-      if ((_model.apiResultaListProductsSubmit?.succeeded ?? true)) {
-        // Get the current shopping cart to preserve quantities
-        final currentCart = FFAppState().shoppingCart.toList();
-
-        // Parse the API response
-        final apiProducts = (getJsonField(
-          (_model.apiResultaListProductsSubmit?.jsonBody ?? ''),
-          r'''$.data.data''',
-          true,
-        )!
-                .toList()
-                .map<DataProductStruct?>(DataProductStruct.maybeFromMap)
-                .toList() as Iterable<DataProductStruct?>)
-            .withoutNulls
-            .toList();
-
-        final cartQuantities = <String, double>{};
-        for (final item in currentCart) {
-          if (item.codigo.isNotEmpty && item.bodega == FFAppState().infoSeller.storageDefault) {
-            cartQuantities[item.codigo] = item.cantidad;
-          }
-        }
-
-        final updatedProducts = <DataProductStruct>[];
-        for (final product in apiProducts) {
-          if (cartQuantities.containsKey(product.codproduc)) {
-            updatedProducts.add(DataProductStruct(
-              codproduc: product.codproduc,
-              descripcio: product.descripcio,
-              precio: product.precio,
-              saldo: product.saldo,
-              unidadmed: product.unidadmed,
-              iva: product.iva,
-              codtariva: product.codtariva,
-              selected: true,
-              cantidad: cartQuantities[product.codproduc] ?? 0.0,
-              codbarras: product.codbarras,
-            ));
-          } else {
-            updatedProducts.add(product);
-          }
-        }
-
-        FFAppState().productList = updatedProducts;
-
-        _model.hasProduct = false;
-        FFAppState().update(() {});
-        _model.pages = DataPageStruct.maybeFromMap(
-          getJsonField(
-            (_model.apiResultaListProductsSubmit?.jsonBody ?? ''),
-            r'''$.data''',
-          ),
-        );
-        safeSetState(() {});
-      } else {
-        await showDialog(
-          context: context,
-          builder: (alertDialogContext) {
-            return AlertDialog(
-              title: Text('Error'),
-              content: Text(
-                getJsonField(
-                  (_model.apiResultaListProductsSubmit?.jsonBody ?? ''),
-                  r'''$.data''',
-                ).toString(),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(alertDialogContext),
-                  child: Text('Ok'),
-                ),
-              ],
-            );
-          },
-        );
-      }
+      await _refreshProductList();
     });
 
     _model.txtBuscarTextController ??= TextEditingController();
@@ -140,9 +54,136 @@ class _ProductosWidgetState extends State<ProductosWidget> {
   @override
   void dispose() {
     _model.dispose();
-
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // When returning to the page, refresh the product list to update quantities.
+      _refreshProductList();
+    }
+  }
+
+  Future<void> _refreshProductList() async {
+    // Load products
+    _model.buscar = _model.txtBuscarTextController.text;
+    _model.apiResultaListProductsSubmit =
+        await ProductsGroup.postListProductByCodPrecioCall.call(
+      token: FFAppState().infoSeller.token,
+      codprecio: FFAppState().dataCliente.codprecio,
+      pageNumber: _model.pages?.currentPage ?? 1,
+      pageSize: 10,
+      filter: _model.buscar,
+    );
+
+    if ((_model.apiResultaListProductsSubmit?.succeeded ?? true)) {
+      final currentCart = FFAppState().shoppingCart.toList();
+      final apiProducts = (getJsonField(
+        (_model.apiResultaListProductsSubmit?.jsonBody ?? ''),
+        r'''$.data.data''',
+        true,
+      )!
+              .toList()
+              .map<DataProductStruct?>(DataProductStruct.maybeFromMap)
+              .toList() as Iterable<DataProductStruct?>)
+          .withoutNulls
+          .toList();
+
+      // Calculate total quantities for each product across ALL warehouses in the cart.
+      final totalCartQuantities = <String, double>{};
+      for (final item in currentCart) {
+        if (item.codigo.isNotEmpty) {
+          totalCartQuantities.update(item.codigo, (value) => value + item.cantidad, ifAbsent: () => item.cantidad);
+        }
+      }
+
+      // This map is for the quantity of the default warehouse, used for the individual counter.
+      final cartQuantities = <String, double>{};
+      for (final item in currentCart) {
+        if (item.codigo.isNotEmpty && item.bodega == FFAppState().infoSeller.storageDefault) {
+          cartQuantities[item.codigo] = item.cantidad;
+        }
+      }
+
+      final updatedProducts = <DataProductStruct>[];
+      for (final product in apiProducts) {
+        final totalQuantity = totalCartQuantities[product.codproduc] ?? 0.0;
+        final defaultWarehouseQuantity = cartQuantities[product.codproduc] ?? 0.0;
+
+        updatedProducts.add(DataProductStruct(
+          codproduc: product.codproduc,
+          descripcio: product.descripcio,
+          precio: product.precio,
+          saldo: product.saldo,
+          unidadmed: product.unidadmed,
+          iva: product.iva,
+          codtariva: product.codtariva,
+          // The 'selected' state should depend on the total quantity in the cart.
+          selected: totalQuantity > 0,
+          // The 'cantidad' for the individual counter should be from the default warehouse.
+          cantidad: defaultWarehouseQuantity,
+          codbarras: product.codbarras,
+        ));
+      }
+
+      FFAppState().productList = updatedProducts;
+
+      // Update the store with the total quantities for the general counter.
+      final updatedStore = <DetailProductStruct>[];
+      totalCartQuantities.forEach((codproduc, cantidad) {
+        final productInCart = currentCart.firstWhere((item) => item.codigo == codproduc, orElse: () => DetailProductStruct());
+        updatedStore.add(DetailProductStruct(
+          codigo: codproduc,
+          cantidad: cantidad,
+          // Add other necessary fields from productInCart if needed
+          descripcio: productInCart.descripcio,
+          precio: productInCart.precio,
+          saldo: productInCart.saldo,
+          unidadmed: productInCart.unidadmed,
+          iva: productInCart.iva,
+          codtariva: productInCart.codtariva,
+          bodega: '', // Not relevant for the general counter
+          codcc: '',
+          codlote: '',
+        ));
+      });
+      FFAppState().store = updatedStore;
+
+      _model.hasProduct = false;
+      FFAppState().update(() {});
+      _model.pages = DataPageStruct.maybeFromMap(
+        getJsonField(
+          (_model.apiResultaListProductsSubmit?.jsonBody ?? ''),
+          r'''$.data''',
+        ),
+      );
+      safeSetState(() {});
+    } else {
+      await showDialog(
+        context: context,
+        builder: (alertDialogContext) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text(
+              getJsonField(
+                (_model.apiResultaListProductsSubmit?.jsonBody ?? ''),
+                r'''$.data''',
+              ).toString(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(alertDialogContext),
+                child: Text('Ok'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -425,7 +466,6 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                                     _model
                                                         .txtBuscarTextController
                                                         ?.clear();
-                                                    _model.buscar = '';
                                                     safeSetState(() {});
 
                                                     // Realizar la búsqueda con el campo vacío
@@ -786,8 +826,7 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                           filter: _model.buscar,
                                         );
 
-                                        if ((_model
-                                                .apiResultCodeScan?.succeeded ??
+                                        if ((_model.apiResultCodeScan?.succeeded ??
                                             true)) {
                                           _model.resultadoProductoCacheScan =
                                               await actions
@@ -902,13 +941,7 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                   ),
                         ),
                         Text(
-                          valueOrDefault<String>(
-                            _model.pages != null
-                                ? ((_model.pages!.currentPage - 1) * 10 + 1)
-                                    .toString()
-                                : '0',
-                            '0',
-                          ),
+                          '${((_model.pages?.currentPage ?? 1) - 1) * 10 + 1}',
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
                                     fontFamily: 'Manrope',
@@ -926,18 +959,7 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                   ),
                         ),
                         Text(
-                          valueOrDefault<String>(
-                            _model.pages != null
-                                ? ((int page, int totalProducts) {
-                                    return (page * 10 < totalProducts)
-                                        ? page * 10
-                                        : totalProducts;
-                                  }(_model.pages!.currentPage,
-                                        _model.pages!.totalCount))
-                                    .toString()
-                                : '0',
-                            '0',
-                          ),
+                          '${((_model.pages?.currentPage ?? 1) * 10 < (_model.pages?.totalCount ?? 0)) ? ((_model.pages?.currentPage ?? 1) * 10) : (_model.pages?.totalCount ?? 0)}',
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
                                     fontFamily: 'Manrope',
@@ -955,12 +977,7 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                   ),
                         ),
                         Text(
-                          valueOrDefault<String>(
-                            _model.pages != null
-                                ? _model.pages?.totalCount?.toString()
-                                : '0',
-                            '0',
-                          ),
+                          '${_model.pages?.totalCount ?? 0}',
                           style:
                               FlutterFlowTheme.of(context).bodyMedium.override(
                                     fontFamily: 'Manrope',
@@ -1284,108 +1301,91 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                   color: FlutterFlowTheme.of(context).info,
                                   size: 20.0,
                                 ),
-                                onPressed: (_model.pages?.hasPreviousPage ==
-                                            false ||
-                                        _isLoadingPrevPage)
-                                    ? null
-                                    : () async {
-                                        setState(() {
-                                          _isLoadingPrevPage = true;
-                                        });
+                                onPressed: () async {
+                                  if (_isLoadingPrevPage ||
+                                      _model.pages?.currentPage == 1) {
+                                    return;
+                                  }
+                                  setState(() => _isLoadingPrevPage = true);
+                                  try {
+                                    _model.apiResultaListProductsSubmit =
+                                        await ProductsGroup
+                                            .postListProductByCodPrecioCall
+                                            .call(
+                                      token: FFAppState().infoSeller.token,
+                                      codprecio:
+                                          FFAppState().dataCliente.codprecio,
+                                      pageNumber:
+                                          (_model.pages?.currentPage ?? 1) - 1,
+                                      pageSize: 10,
+                                      filter: _model.buscar,
+                                    );
 
-                                        try {
-                                          _model.apiResultBackPage =
-                                              await ProductsGroup
-                                                  .postListProductByCodPrecioCall
-                                                  .call(
-                                            token:
-                                                FFAppState().infoSeller.token,
-                                            pageNumber:
-                                                _model.pages!.currentPage - 1,
-                                            pageSize: 10,
-                                            filter: _model
-                                                .txtBuscarTextController.text,
-                                            codprecio: FFAppState()
-                                                .dataCliente
-                                                .codprecio,
+                                    if ((_model.apiResultaListProductsSubmit
+                                            ?.succeeded ??
+                                        true)) {
+                                      _model.resultadoProductoCacheSubmit =
+                                          await actions
+                                              .actualizarListaProductosCache(
+                                        (getJsonField(
+                                          (_model.apiResultaListProductsSubmit
+                                                  ?.jsonBody ??
+                                              ''),
+                                          r'''$.data.data''',
+                                          true,
+                                        )! as List)
+                                            .map<DataProductStruct?>((e) =>
+                                                DataProductStruct.maybeFromMap(
+                                                    e))
+                                            .withoutNulls
+                                            .toList(),
+                                        FFAppState().shoppingCart.toList(),
+                                        _model.buscar,
+                                      );
+                                      FFAppState().productList = _model
+                                          .resultadoProductoCacheSubmit!
+                                          .toList()
+                                          .cast<DataProductStruct>();
+                                      _model.pages = DataPageStruct.maybeFromMap(
+                                        getJsonField(
+                                          (_model.apiResultaListProductsSubmit
+                                                  ?.jsonBody ??
+                                              ''),
+                                          r'''$.data''',
+                                        ),
+                                      );
+                                      safeSetState(() {});
+                                    } else {
+                                      await showDialog(
+                                        context: context,
+                                        builder: (alertDialogContext) {
+                                          return AlertDialog(
+                                            title: Text('Error'),
+                                            content: Text(
+                                              'No se pudo cargar la página anterior.',
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.pop(
+                                                        alertDialogContext),
+                                                child: Text('Ok'),
+                                              ),
+                                            ],
                                           );
-
-                                          if ((_model.apiResultBackPage
-                                                  ?.succeeded ??
-                                              true)) {
-                                            _model.resultadoBackPage =
-                                                await actions
-                                                    .actualizarListaProductosCache(
-                                              (getJsonField(
-                                                (_model.apiResultBackPage
-                                                        ?.jsonBody ??
-                                                    ''),
-                                                r'''$.data.data''',
-                                                true,
-                                              )!
-                                                          .toList()
-                                                          .map<DataProductStruct?>(
-                                                              DataProductStruct
-                                                                  .maybeFromMap)
-                                                          .toList()
-                                                      as Iterable<
-                                                          DataProductStruct?>)
-                                                  .withoutNulls
-                                                  .toList(),
-                                              FFAppState()
-                                                  .shoppingCart
-                                                  .toList(),
-                                              _model.buscar,
-                                            );
-                                            FFAppState().productList = _model
-                                                .resultadoBackPage!
-                                                .toList()
-                                                .cast<DataProductStruct>();
-                                            safeSetState(() {});
-                                            _model.pages =
-                                                DataPageStruct.maybeFromMap(
-                                                    getJsonField(
-                                              (_model.apiResultBackPage
-                                                      ?.jsonBody ??
-                                                  ''),
-                                              r'''$.data''',
-                                            ));
-                                            safeSetState(() {});
-                                          } else {
-                                            await showDialog(
-                                              context: context,
-                                              builder: (alertDialogContext) {
-                                                return AlertDialog(
-                                                  title: Text('Error'),
-                                                  content: Text(getJsonField(
-                                                    (_model.apiResultBackPage
-                                                            ?.jsonBody ??
-                                                        ''),
-                                                    r'''$.data''',
-                                                  ).toString()),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.pop(
-                                                              alertDialogContext),
-                                                      child: Text('Ok'),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          }
-                                        } catch (e) {
-                                          print(
-                                              'Error loading previous page: $e');
-                                        } finally {
-                                          if (mounted) {
-                                            setState(() {
-                                              _isLoadingPrevPage = false;
-                                            });
-                                          }
-                                        }
-                                      },
+                                        },
+                                      );
+                                    }
+                                  } catch (e) {
+                                    print('Error loading previous page: $e');
+                                  } finally {
+                                    if (mounted) {
+                                      setState(() {
+                                        _isLoadingPrevPage = false;
+                                      });
+                                    }
+                                  }
+                                },
                               ),
                             ],
                           ),
@@ -1422,7 +1422,7 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                       ),
                                       Text(
                                         valueOrDefault<String>(
-                                          _model.pages?.currentPage?.toString(),
+                                          _model.pages?.currentPage.toString(),
                                           '#',
                                         ),
                                         style: FlutterFlowTheme.of(context)
@@ -1445,7 +1445,7 @@ class _ProductosWidgetState extends State<ProductosWidget> {
                                       ),
                                       Text(
                                         valueOrDefault<String>(
-                                          _model.pages?.totalPages?.toString(),
+                                          _model.pages?.totalPages.toString(),
                                           '#',
                                         ),
                                         style: FlutterFlowTheme.of(context)
