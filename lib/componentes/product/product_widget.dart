@@ -307,7 +307,7 @@ class _ProductWidgetState extends State<ProductWidget> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        'La bodega no tiene saldo, debes elegir otra bodega desde el detalle',
+                                        'La bodega ${FFAppState().infoSeller.storageDefault} no tiene saldo, debes elegir otra bodega desde el detalle',
                                         style: TextStyle(
                                           color: FlutterFlowTheme.of(context).secondaryBackground,
                                         ),
@@ -455,7 +455,7 @@ class _ProductWidgetState extends State<ProductWidget> {
                                           ScaffoldMessenger.of(context).showSnackBar(
                                             SnackBar(
                                               content: Text(
-                                                'No se puede superar el saldo de la bodega, debes elegir otra bodega desde el detalle',
+                                                'No se puede superar el saldo de la bodega ${FFAppState().infoSeller.storageDefault}, debes elegir otra bodega desde el detalle',
                                                 style: TextStyle(
                                                   color: FlutterFlowTheme.of(context).secondaryBackground,
                                                 ),
@@ -596,7 +596,7 @@ class _ProductWidgetState extends State<ProductWidget> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          'No se puede superar el saldo de la bodega, debes elegir otra bodega desde el detalle',
+                                          'No se puede superar el saldo de la bodega ${FFAppState().infoSeller.storageDefault}, debes elegir otra bodega desde el detalle',
                                           style: TextStyle(
                                             color: FlutterFlowTheme.of(context).secondaryBackground,
                                           ),
