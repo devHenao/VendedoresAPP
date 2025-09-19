@@ -121,7 +121,7 @@ class _ItemShoppingCartWidgetState extends State<ItemShoppingCartWidget> {
                       Expanded(
                         child: Text(
                           valueOrDefault<String>(
-                            widget!.articulo?.descripcio,
+                            widget.articulo?.descripcio,
                             'Descripcio',
                           ),
                           style:
@@ -158,7 +158,7 @@ class _ItemShoppingCartWidgetState extends State<ItemShoppingCartWidget> {
                                 ),
                                 Text(
                                   valueOrDefault<String>(
-                                    widget!.articulo?.codigo,
+                                    widget.articulo?.codigo,
                                     'codigo',
                                   ),
                                   style: FlutterFlowTheme.of(context)
@@ -194,7 +194,7 @@ class _ItemShoppingCartWidgetState extends State<ItemShoppingCartWidget> {
                                 ),
                                 Text(
                                   valueOrDefault<String>(
-                                    widget!.articulo?.bodega,
+                                    widget.articulo?.bodega,
                                     'bodega',
                                   ),
                                   style: FlutterFlowTheme.of(context)
@@ -235,7 +235,7 @@ class _ItemShoppingCartWidgetState extends State<ItemShoppingCartWidget> {
                                 ),
                                 Text(
                                   valueOrDefault<String>(
-                                    widget!.articulo?.codlote,
+                                    widget.articulo?.codlote,
                                     'codlote',
                                   ),
                                   style: FlutterFlowTheme.of(context)
@@ -271,7 +271,7 @@ class _ItemShoppingCartWidgetState extends State<ItemShoppingCartWidget> {
                                 ),
                                 Text(
                                   valueOrDefault<String>(
-                                    widget!.articulo?.codcc,
+                                    widget.articulo?.codcc,
                                     'codcc',
                                   ),
                                   style: FlutterFlowTheme.of(context)
@@ -303,7 +303,7 @@ class _ItemShoppingCartWidgetState extends State<ItemShoppingCartWidget> {
                       ),
                       Text(
                         formatNumber(
-                          widget!.articulo!.precio,
+                          widget.articulo?.precio ?? 0.0,
                           formatType: FormatType.decimal,
                           decimalType: DecimalType.periodDecimal,
                           currency: '\$',
@@ -316,6 +316,29 @@ class _ItemShoppingCartWidgetState extends State<ItemShoppingCartWidget> {
                       ),
                     ].divide(SizedBox(width: 5.0)),
                   ),
+                  if (_model.stockLimit != null)
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Text(
+                          'Saldo:',
+                          style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                fontFamily: 'Manrope',
+                                fontSize: 14.0,
+                                letterSpacing: 0.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                        Text(
+                          _model.stockLimit.toString(),
+                          style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                fontFamily: 'Manrope',
+                                fontSize: 14.0,
+                                letterSpacing: 0.0,
+                              ),
+                        ),
+                      ].divide(SizedBox(width: 5.0)),
+                    ),
                   Padding(
                     padding: EdgeInsetsDirectional.fromSTEB(0.0, 5.0, 0.0, 0.0),
                     child: Row(
@@ -382,16 +405,16 @@ class _ItemShoppingCartWidgetState extends State<ItemShoppingCartWidget> {
                                   color: FlutterFlowTheme.of(context).info,
                                   size: 15.0,
                                 ),
-                                onPressed: (_model.contador! <= 1.0)
+                                onPressed: ((_model.contador ?? 0.0) <= 1.0)
                                     ? null
                                     : () async {
                                         _model.contador =
-                                            (_model.contador!) - 1;
+                                            (_model.contador ?? 1.0) - 1;
                                         _model.updatePage(() {});
                                         safeSetState(() {
                                           _model.amountCartTextController
                                                   ?.text =
-                                              _model.contador!.toString();
+                                              _model.contador.toString();
                                         });
                                         await widget.callbackCantidadCarrito
                                             ?.call(
