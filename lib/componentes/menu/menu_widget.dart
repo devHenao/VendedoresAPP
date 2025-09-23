@@ -271,7 +271,28 @@ class _MenuWidgetState extends State<MenuWidget> {
                           hoverColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           onTap: () async {
-                            context.pushNamed('Carrito');
+                            if (FFAppState().dataCliente.email != null &&
+                                FFAppState().dataCliente.email != '') {
+                              context.pushNamed('Carrito');
+                            } else {
+                              await showDialog(
+                                context: context,
+                                builder: (alertDialogContext) {
+                                  return AlertDialog(
+                                    title: Text('¡Espera!'),
+                                    content: Text(
+                                        'Por favor, selecciona un cliente para acceder al carrito.'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(alertDialogContext),
+                                        child: Text('Ok'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
                           },
                           child: Container(
                             width: double.infinity,
